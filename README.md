@@ -456,7 +456,6 @@ If there is an error occurred, the error message will be returned to this callba
                         }
                     } else if let _ = value as? NSArray {
                         let keyValue:NSArray = (value as? NSArray)!
-                        isDictionary = true
                         for item in keyValue {
                             if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                                 let c = Components(json:item as! NSDictionary)
