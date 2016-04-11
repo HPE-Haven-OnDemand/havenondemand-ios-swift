@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
                          :file => "LICENSE"}
   s.authors          = { "Phong Vu" => "van-phong.vu@hpe.com"}
   s.source           = { :git => "https://github.com/HPE-Haven-OnDemand/havenondemand-ios-swift.git", :tag => s.version.to_s }
-  s.social_media_url = 'https://twitter.com/sendgrid'
+  s.social_media_url = 'https://twitter.com/HavenOnDemand'
 
   s.platform         = :ios, '8.2'
   s.requires_arc     = true
