@@ -17,11 +17,14 @@ public struct HODErrorCode {
     static let UNKNOWN_ERROR = 1660
 }
 
-class HODResponseParser
+public class HODResponseParser
 {
     var hodErrors : NSMutableArray = []
-    
-    func GetLastError() -> NSMutableArray
+
+    public init() {
+        
+    }
+    public func GetLastError() -> NSMutableArray
     {
         return hodErrors
     }
@@ -34,7 +37,7 @@ class HODResponseParser
         hodErrors.addObject(error)
     }
 
-    func ParseJobID(jsonStr:String) -> String?
+    public func ParseJobID(jsonStr:String) -> String?
     {
         var jobID : String?
         
@@ -54,7 +57,7 @@ class HODResponseParser
         }
         return jobID
     }
-    private func getResult(inout jsonStr:String) -> String?
+    public func getResult(inout jsonStr:String) -> String?
     {
         resetErrors()
         var result = jsonStr
@@ -161,7 +164,7 @@ class HODResponseParser
         let hodError = HODErrorObject(json: errorObj)
         addError(hodError)
     }
-    func ParseSpeechRecognitionResponse(inout jsonStr:String) -> SpeechRecognitionResponse?
+    public func ParseSpeechRecognitionResponse(inout jsonStr:String) -> SpeechRecognitionResponse?
     {
         var obj : SpeechRecognitionResponse!
         if let result = getResult(&jsonStr) {
@@ -175,7 +178,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseCancelConnectorScheduleResponse(inout jsonStr:String) -> CancelConnectorScheduleResponse?
+    public func ParseCancelConnectorScheduleResponse(inout jsonStr:String) -> CancelConnectorScheduleResponse?
     {
         var obj : CancelConnectorScheduleResponse!
         if let result = getResult(&jsonStr) {
@@ -189,7 +192,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseConnectorHistoryResponse(inout jsonStr:String) -> ConnectorHistoryResponse?
+    public func ParseConnectorHistoryResponse(inout jsonStr:String) -> ConnectorHistoryResponse?
     {
         var obj : ConnectorHistoryResponse!
         if let result = getResult(&jsonStr) {
@@ -203,7 +206,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseConnectorStatusResponse(inout jsonStr:String) -> ConnectorStatusResponse?
+    public func ParseConnectorStatusResponse(inout jsonStr:String) -> ConnectorStatusResponse?
     {
         var obj : ConnectorStatusResponse!
         if let result = getResult(&jsonStr) {
@@ -217,7 +220,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseCreateConnectorResponse(inout jsonStr:String) -> CreateConnectorResponse?
+    public func ParseCreateConnectorResponse(inout jsonStr:String) -> CreateConnectorResponse?
     {
         var obj : CreateConnectorResponse!
         if let result = getResult(&jsonStr) {
@@ -231,7 +234,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseDeleteConnectorResponse(inout jsonStr:String) -> DeleteConnectorResponse?
+    public func ParseDeleteConnectorResponse(inout jsonStr:String) -> DeleteConnectorResponse?
     {
         var obj : DeleteConnectorResponse!
         if let result = getResult(&jsonStr) {
@@ -245,7 +248,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRetrieveConnectorConfigurationAttrResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationAttrResponse?
+    public func ParseRetrieveConnectorConfigurationAttrResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationAttrResponse?
     {
         var obj : RetrieveConnectorConfigurationAttrResponse!
         if let result = getResult(&jsonStr) {
@@ -259,7 +262,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRetrieveConnectorConfigurationFileResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationFileResponse?
+    public func ParseRetrieveConnectorConfigurationFileResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationFileResponse?
     {
         var obj : RetrieveConnectorConfigurationFileResponse!
         if let result = getResult(&jsonStr) {
@@ -273,7 +276,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseStartConnectorResponse(inout jsonStr:String) -> StartConnectorResponse?
+    public func ParseStartConnectorResponse(inout jsonStr:String) -> StartConnectorResponse?
     {
         var obj : StartConnectorResponse!
         if let result = getResult(&jsonStr) {
@@ -287,7 +290,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseStopConnectorResponse(inout jsonStr:String) -> StopConnectorResponse?
+    public func ParseStopConnectorResponse(inout jsonStr:String) -> StopConnectorResponse?
     {
         var obj : StopConnectorResponse!
         if let result = getResult(&jsonStr) {
@@ -301,7 +304,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseUpdateConnectorResponse(inout jsonStr:String) -> UpdateConnectorResponse?
+    public func ParseUpdateConnectorResponse(inout jsonStr:String) -> UpdateConnectorResponse?
     {
         var obj : UpdateConnectorResponse!
         if let result = getResult(&jsonStr) {
@@ -315,7 +318,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseExpandContainerResponse(inout jsonStr:String) -> ExpandContainerResponse?
+    public func ParseExpandContainerResponse(inout jsonStr:String) -> ExpandContainerResponse?
     {
         var obj : ExpandContainerResponse!
         if let result = getResult(&jsonStr) {
@@ -329,7 +332,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseStoreObjectResponse(inout jsonStr:String) -> StoreObjectResponse?
+    public func ParseStoreObjectResponse(inout jsonStr:String) -> StoreObjectResponse?
     {
         var obj : StoreObjectResponse!
         if let result = getResult(&jsonStr) {
@@ -343,7 +346,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseViewDocumentResponse(inout jsonStr:String) -> ViewDocumentResponse?
+    public func ParseViewDocumentResponse(inout jsonStr:String) -> ViewDocumentResponse?
     {
         var obj : ViewDocumentResponse!
         if let result = getResult(&jsonStr) {
@@ -357,7 +360,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseGetCommonNeighborsResponse(inout jsonStr:String) -> GetCommonNeighborsResponse?
+    public func ParseGetCommonNeighborsResponse(inout jsonStr:String) -> GetCommonNeighborsResponse?
     {
         var obj : GetCommonNeighborsResponse!
         if let result = getResult(&jsonStr) {
@@ -371,7 +374,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseGetNeighborsResponse(inout jsonStr:String) -> GetNeighborsResponse?
+    public func ParseGetNeighborsResponse(inout jsonStr:String) -> GetNeighborsResponse?
     {
         var obj : GetNeighborsResponse!
         if let result = getResult(&jsonStr) {
@@ -385,7 +388,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseGetNodesResponse(inout jsonStr:String) -> GetNodesResponse?
+    public func ParseGetNodesResponse(inout jsonStr:String) -> GetNodesResponse?
     {
         var obj : GetNodesResponse!
         if let result = getResult(&jsonStr) {
@@ -399,7 +402,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseGetShortestPathResponse(inout jsonStr:String) -> GetShortestPathResponse?
+    public func ParseGetShortestPathResponse(inout jsonStr:String) -> GetShortestPathResponse?
     {
         var obj : GetShortestPathResponse!
         if let result = getResult(&jsonStr) {
@@ -413,7 +416,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseGetSubgraphResponse(inout jsonStr:String) -> GetSubgraphResponse?
+    public func ParseGetSubgraphResponse(inout jsonStr:String) -> GetSubgraphResponse?
     {
         var obj : GetSubgraphResponse!
         if let result = getResult(&jsonStr) {
@@ -427,7 +430,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseSuggestLinksResponse(inout jsonStr:String) -> SuggestLinksResponse?
+    public func ParseSuggestLinksResponse(inout jsonStr:String) -> SuggestLinksResponse?
     {
         var obj : SuggestLinksResponse!
         if let result = getResult(&jsonStr) {
@@ -441,7 +444,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseSummarizeGraphResponse(inout jsonStr:String) -> SummarizeGraphResponse?
+    public func ParseSummarizeGraphResponse(inout jsonStr:String) -> SummarizeGraphResponse?
     {
         var obj : SummarizeGraphResponse!
         if let result = getResult(&jsonStr) {
@@ -455,7 +458,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseOCRDocumentResponse(inout jsonStr:String) -> OCRDocumentResponse?
+    public func ParseOCRDocumentResponse(inout jsonStr:String) -> OCRDocumentResponse?
     {
         var obj : OCRDocumentResponse!
         if let result = getResult(&jsonStr) {
@@ -469,7 +472,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRecognizeBarcodesResponse(inout jsonStr:String) -> RecognizeBarcodesResponse?
+    public func ParseRecognizeBarcodesResponse(inout jsonStr:String) -> RecognizeBarcodesResponse?
     {
         var obj : RecognizeBarcodesResponse!
         if let result = getResult(&jsonStr) {
@@ -483,7 +486,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseDetectFacesResponse(inout jsonStr:String) -> DetectFacesResponse?
+    public func ParseDetectFacesResponse(inout jsonStr:String) -> DetectFacesResponse?
     {
         var obj : DetectFacesResponse!
         if let result = getResult(&jsonStr) {
@@ -497,7 +500,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRecognizeImagesResponse(inout jsonStr:String) -> RecognizeImagesResponse?
+    public func ParseRecognizeImagesResponse(inout jsonStr:String) -> RecognizeImagesResponse?
     {
         var obj : RecognizeImagesResponse!
         if let result = getResult(&jsonStr) {
@@ -511,7 +514,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParsePredictResponse(inout jsonStr:String) -> PredictResponse?
+    public func ParsePredictResponse(inout jsonStr:String) -> PredictResponse?
     {
         var obj : PredictResponse!
         if let result = getResult(&jsonStr) {
@@ -525,7 +528,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRecommendResponse(inout jsonStr:String) -> RecommendResponse?
+    public func ParseRecommendResponse(inout jsonStr:String) -> RecommendResponse?
     {
         var obj : RecommendResponse!
         if let result = getResult(&jsonStr) {
@@ -539,7 +542,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseTrainPredictorResponse(inout jsonStr:String) -> TrainPredictorResponse?
+    public func ParseTrainPredictorResponse(inout jsonStr:String) -> TrainPredictorResponse?
     {
         var obj : TrainPredictorResponse!
         if let result = getResult(&jsonStr) {
@@ -553,7 +556,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseCreateQueryProfileResponse(inout jsonStr:String) -> CreateQueryProfileResponse?
+    public func ParseCreateQueryProfileResponse(inout jsonStr:String) -> CreateQueryProfileResponse?
     {
         var obj : CreateQueryProfileResponse!
         if let result = getResult(&jsonStr) {
@@ -567,7 +570,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseDeleteQueryProfileResponse(inout jsonStr:String) -> DeleteQueryProfileResponse?
+    public func ParseDeleteQueryProfileResponse(inout jsonStr:String) -> DeleteQueryProfileResponse?
     {
         var obj : DeleteQueryProfileResponse!
         if let result = getResult(&jsonStr) {
@@ -581,7 +584,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRetrieveQueryProfileResponse(inout jsonStr:String) -> RetrieveQueryProfileResponse?
+    public func ParseRetrieveQueryProfileResponse(inout jsonStr:String) -> RetrieveQueryProfileResponse?
     {
         var obj : RetrieveQueryProfileResponse!
         if let result = getResult(&jsonStr) {
@@ -595,7 +598,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseUpdateQueryProfileResponse(inout jsonStr:String) -> UpdateQueryProfileResponse?
+    public func ParseUpdateQueryProfileResponse(inout jsonStr:String) -> UpdateQueryProfileResponse?
     {
         var obj : UpdateQueryProfileResponse!
         if let result = getResult(&jsonStr) {
@@ -609,7 +612,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseFindRelatedConceptsResponse(inout jsonStr:String) -> FindRelatedConceptsResponse?
+    public func ParseFindRelatedConceptsResponse(inout jsonStr:String) -> FindRelatedConceptsResponse?
     {
         var obj : FindRelatedConceptsResponse!
         if let result = getResult(&jsonStr) {
@@ -623,7 +626,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseAutoCompleteResponse(inout jsonStr:String) -> AutoCompleteResponse?
+    public func ParseAutoCompleteResponse(inout jsonStr:String) -> AutoCompleteResponse?
     {
         var obj : AutoCompleteResponse!
         if let result = getResult(&jsonStr) {
@@ -637,7 +640,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseExtractConceptsResponse(inout jsonStr:String) -> ExtractConceptsResponse?
+    public func ParseExtractConceptsResponse(inout jsonStr:String) -> ExtractConceptsResponse?
     {
         var obj : ExtractConceptsResponse!
         if let result = getResult(&jsonStr) {
@@ -651,7 +654,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseExpandTermsResponse(inout jsonStr:String) -> ExpandTermsResponse?
+    public func ParseExpandTermsResponse(inout jsonStr:String) -> ExpandTermsResponse?
     {
         var obj : ExpandTermsResponse!
         if let result = getResult(&jsonStr) {
@@ -665,7 +668,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseHighlightTextResponse(inout jsonStr:String) -> HighlightTextResponse?
+    public func ParseHighlightTextResponse(inout jsonStr:String) -> HighlightTextResponse?
     {
         var obj : HighlightTextResponse!
         if let result = getResult(&jsonStr) {
@@ -679,7 +682,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseIdentifyLanguageResponse(inout jsonStr:String) -> IdentifyLanguageResponse?
+    public func ParseIdentifyLanguageResponse(inout jsonStr:String) -> IdentifyLanguageResponse?
     {
         var obj : IdentifyLanguageResponse!
         if let result = getResult(&jsonStr) {
@@ -693,7 +696,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseSentimentAnalysisResponse(inout jsonStr:String) -> SentimentAnalysisResponse?
+    public func ParseSentimentAnalysisResponse(inout jsonStr:String) -> SentimentAnalysisResponse?
     {
         var obj : SentimentAnalysisResponse!
         if let result = getResult(&jsonStr) {
@@ -707,7 +710,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseTokenizeTextResponse(inout jsonStr:String) -> TokenizeTextResponse?
+    public func ParseTokenizeTextResponse(inout jsonStr:String) -> TokenizeTextResponse?
     {
         var obj : TokenizeTextResponse!
         if let result = getResult(&jsonStr) {
@@ -721,7 +724,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseAddToTextIndexResponse(inout jsonStr:String) -> AddToTextIndexResponse?
+    public func ParseAddToTextIndexResponse(inout jsonStr:String) -> AddToTextIndexResponse?
     {
         var obj : AddToTextIndexResponse!
         if let result = getResult(&jsonStr) {
@@ -735,7 +738,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseCreateTextIndexResponse(inout jsonStr:String) -> CreateTextIndexResponse?
+    public func ParseCreateTextIndexResponse(inout jsonStr:String) -> CreateTextIndexResponse?
     {
         var obj : CreateTextIndexResponse!
         if let result = getResult(&jsonStr) {
@@ -749,7 +752,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseDeleteTextIndexResponse(inout jsonStr:String) -> DeleteTextIndexResponse?
+    public func ParseDeleteTextIndexResponse(inout jsonStr:String) -> DeleteTextIndexResponse?
     {
         var obj : DeleteTextIndexResponse!
         if let result = getResult(&jsonStr) {
@@ -763,7 +766,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseDeleteFromTextIndexResponse(inout jsonStr:String) -> DeleteFromTextIndexResponse?
+    public func ParseDeleteFromTextIndexResponse(inout jsonStr:String) -> DeleteFromTextIndexResponse?
     {
         var obj : DeleteFromTextIndexResponse!
         if let result = getResult(&jsonStr) {
@@ -777,7 +780,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseIndexStatusResponse(inout jsonStr:String) -> IndexStatusResponse?
+    public func ParseIndexStatusResponse(inout jsonStr:String) -> IndexStatusResponse?
     {
         var obj : IndexStatusResponse!
         if let result = getResult(&jsonStr) {
@@ -791,7 +794,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseListResourcesResponse(inout jsonStr:String) -> ListResourcesResponse?
+    public func ParseListResourcesResponse(inout jsonStr:String) -> ListResourcesResponse?
     {
         var obj : ListResourcesResponse!
         if let result = getResult(&jsonStr) {
@@ -805,7 +808,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseRestoreTextIndexResponse(inout jsonStr:String) -> RestoreTextIndexResponse?
+    public func ParseRestoreTextIndexResponse(inout jsonStr:String) -> RestoreTextIndexResponse?
     {
         var obj : RestoreTextIndexResponse!
         if let result = getResult(&jsonStr) {
@@ -819,7 +822,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseAnomalyDetectionResponse(inout jsonStr:String) -> AnomalyDetectionResponse?
+    public func ParseAnomalyDetectionResponse(inout jsonStr:String) -> AnomalyDetectionResponse?
     {
         var obj : AnomalyDetectionResponse!
         if let result = getResult(&jsonStr) {
@@ -833,7 +836,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseTrendAnalysisResponse(inout jsonStr:String) -> TrendAnalysisResponse?
+    public func ParseTrendAnalysisResponse(inout jsonStr:String) -> TrendAnalysisResponse?
     {
         var obj : TrendAnalysisResponse!
         if let result = getResult(&jsonStr) {
@@ -847,7 +850,7 @@ class HODResponseParser
         }
         return obj
     }
-    func ParseCustomResponse(inout jsonStr:String) -> NSDictionary?
+    public func ParseCustomResponse(inout jsonStr:String) -> NSDictionary?
     {
         resetErrors()
         var obj : NSDictionary!

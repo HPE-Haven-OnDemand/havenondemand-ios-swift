@@ -2,22 +2,41 @@
 
 ----
 ## Overview
-HODClient for iOS - Swift is a utility class, which helps you easily integrate your iOS app with HP Haven OnDemand Services.
+HODClient library for iOS - Swift is a utility class, which helps you easily access over 60 APIs from HPE Haven OnDemand platform.
 
-HODClient V2.0 supports bulk input (source inputs can be an array) where an HOD API is capable of doing so.
+The library contains 2 packages:
 
-Version 2.0 also includes a HODResponseParser library.
+HODClient package for sending HTTP GET/POST requests to Haven OnDemand APIs.
 
-HODClient class exposes source code so you can modify it as you wish.
+HODResponseParser package for parsing JSON responses from Haven OnDemand APIs.
+
+HODClient library requires the Swift 2.0 or newer.
 
 ----
-## Integrate HODClient into iOS Swift project
+## Integrate HODClient into iOS Swift project from  Cocoapods
+1. Follow instruction from this page https://guides.cocoapods.org/using/using-cocoapods.html
+2. Open the PodFile and edit it as follows:
+
+```
+    platform :ios, '8.2'    
+    use_frameworks!
+    
+    target 'YourApp' do
+    pod 'havenondemand', '1.0.0'
+    end
+```
+3. Open YourApp.xcworkspace and build.
+4. Add .import havenondemand to your swift file
+
+
+## Integrate HODClient directly into iOS Swift project
 1. Download the HODClient library for iOS.
 2. Create a new or open an existing iOS Swift project
 3. Add the HODClient.swift file to the project. 
 >![](/images/importlibrary1.jpg)
 4. Browse to the folder where you saved the library and select the HODClient.swift file.
 5. If you want to use the HODResponseParser library, follow the step 4 to add also the HODResponseParser.swift and HODResponseObjects files.
+
 
 ----
 ## HODClient API References
@@ -211,7 +230,7 @@ In your class, you will need to inherit the HODClientDelegate protocol and imple
     
         func requestCompletedWithJobID(response:String){ }
     
-        func requestCompletedWithContent(response:String){ }
+        func requestCompletedWithContent(var response:String){ }
     
         func onErrorOccurred(errorMessage:String){ }
     
@@ -725,6 +744,8 @@ ParseDeleteFromTextIndexResponse(inout jsonStr:String) -> DeleteFromTextIndexRes
 ParseIndexStatusResponse(inout jsonStr:String) -> IndexStatusResponse?
 ParseListResourcesResponse(inout jsonStr:String) -> ListResourcesResponse?
 ParseRestoreTextIndexResponse(inout jsonStr:String) -> RestoreTextIndexResponse?
+ParseAnomalyDetectionResponse(inout jsonStr:String) -> AnomalyDetectionResponse?
+ParseTrendAnalysisResponse(inout jsonStr:String) -> TrendAnalysisResponse?
 ```
 
 ## License
