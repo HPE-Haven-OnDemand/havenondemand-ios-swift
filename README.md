@@ -6,34 +6,34 @@ HODClient library for iOS - Swift is a utility class, which helps you easily acc
 
 The library contains 2 packages:
 
-HODClient package for sending HTTP GET/POST requests to Haven OnDemand APIs.
+* HODClient package for sending HTTP GET/POST requests to Haven OnDemand APIs.
 
-HODResponseParser package for parsing JSON responses from Haven OnDemand APIs.
+* HODResponseParser package for parsing JSON responses from Haven OnDemand APIs.
 
-HODClient library requires the Swift 2.0 or newer.
+HODClient library requires Swift 2.0 or newer.
 
 ----
 ## Integrate HODClient into iOS Swift project from  Cocoapods
-1. Follow instructions from this page to install and initialize CocoaPods: https://guides.cocoapods.org/using/using-cocoapods.html
-2. Run $ open -a PodFile and edit it the content as follows:
-
+1. Follow instructions from [this](https://guides.cocoapods.org/using/using-cocoapods.html) page to install and initialize CocoaPods
+2. Run `open -a PodFile` and add the following:
 ```
     platform :ios, '8.2'    
     use_frameworks!
-    
+
     target 'YourApp' do
-    pod 'havenondemand', '~> 1.0.0'
+    pod 'havenondemand', '~> 1.0.1'
     end
 ```
-3. Save the PodFile then run $ pod install
-4. Open YourApp.xcworkspace and build.
-5. Add import havenondemand to your swift file
+3. Save the PodFile
+4. Run `pod install`
+4. Open `YourApp.xcworkspace` and build.
+5. Add `import havenondemand` to your swift file
 
 
 ## Integrate HODClient directly into iOS Swift project
 1. Download the HODClient library for iOS.
 2. Create a new or open an existing iOS Swift project
-3. Add the HODClient.swift file to the project. 
+3. Add the HODClient.swift file to the project.
 >![](/images/importlibrary1.jpg)
 4. Browse to the folder where you saved the library and select the HODClient.swift file.
 5. If you want to use the HODResponseParser library, follow the step 4 to add also the HODResponseParser.swift and HODResponseObjects files.
@@ -63,26 +63,26 @@ HODClient library requires the Swift 2.0 or newer.
 
     GetRequest(inout params:Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
 
-*Description:* 
+*Description:*
 
 * Sends a HTTP GET request to call a Haven OnDemand API.
 
-*Parameters:* 
+*Parameters:*
 
 * params: a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API.
 
->Note: 
->In the case of a parameter type is an array<>, the value must be defined as an array []. 
+>Note:
+>In the case of a parameter type is an array<>, the value must be defined as an array [].
 
 >E.g.:
-## 
+##
     var params = Dictionary<String,AnyObject>()
     var urls = [String]()
     urls.append("http://www.cnn.com")
     urls.append("http://www.bbc.com")
     params["entity_type"] = ["people_eng","places_eng"]
     params["url"] = urls
-    
+
 * hodApp: a string to identify a Haven OnDemand API. E.g. "extractentities". Current supported apps are listed in the HODApps object.
 * mode [REQ_MODE.SYNC | REQ_MODE.ASYNC]: specifies API call as Asynchronous or Synchronous. The default mode is .ASYNC.
 
@@ -95,34 +95,34 @@ HODClient library requires the Swift 2.0 or newer.
 * If there is an error occurred, the error message will be sent via the onErrorOccurred(errorMessage:String) callback function.
 
 *Example code:*
-## 
+##
     // Call the Entity Extraction API to find people and places from CNN website
 
     var hodApp = hodClient.hodApps.ENTITY_EXTRACTION;
     var entities = ["people_eng","places_eng"]
-    var params = Dictionary<String, AnyObject>() 
+    var params = Dictionary<String, AnyObject>()
     params["url"] = "http://www.cnn.com"
     params["entity_type"] = entities
     hodClient.GetRequest(&params, hodApp:hodApp, requestMode: HODClient.REQ_MODE.SYNC);
 
 ----
 **Function PostRequest**
- 
+
     PostRequest(inout params:Dictionary<String, Object>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
 
-*Description:* 
+*Description:*
 
 * Sends a HTTP POST request to call a Haven OnDemand API.
 
 *Parameters:*
 
-* params: a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API. 
+* params: a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API.
 
->Note: 
->In the case of a parameter type is an array<>, the value must be defined as an array []. 
+>Note:
+>In the case of a parameter type is an array<>, the value must be defined as an array [].
 
 >E.g.:
-## 
+##
     var params = Dictionary<String,AnyObject>()
     var urls = [String]()
     urls.append("http://www.cnn.com")
@@ -142,7 +142,7 @@ HODClient library requires the Swift 2.0 or newer.
 * If there is an error occurred, the error message will be sent via the onErrorOccurred(errorMessage:String) callback function.
 
 *Example code:*
-## 
+##
     // Call the OCR Document API to scan text from an image file
 
     var hodApp = hodClient.hodApps.OCR_DOCUMENT
@@ -164,12 +164,12 @@ HODClient library requires the Swift 2.0 or newer.
 
 * jobID: the job ID returned from a Haven OnDemand API upon an asynchronous call.
 
-*Response:* 
+*Response:*
 
 * Response will be returned via the requestCompletedWithContent(response:String)
 
 *Example code:*
-## 
+##
     // Parse a JSON string contained a jobID and call the function to get the actual content from Haven OnDemand server
 
     func requestCompletedWithJobID(response:String)
@@ -178,7 +178,7 @@ HODClient library requires the Swift 2.0 or newer.
         var jsonError: NSError?
         let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding);
         let json = NSJSONSerialization.JSONObjectWithData(data!, options: nil, error: &jsonError) as! NSDictionary
-        
+
         if let unwrappedError = jsonError {
             println("json error: \(unwrappedError)")
         } else {
@@ -199,12 +199,12 @@ HODClient library requires the Swift 2.0 or newer.
 
 * jobID: the job ID returned from a Haven OnDemand API upon an asynchronous call.
 
-*Response:* 
+*Response:*
 
 * Response will be returned via the requestCompletedWithContent(response:String)
 
 *Example code:*
-## 
+##
     // Parse a JSON string contained a jobID and call the function to get the actual content from Haven OnDemand server
 
     func requestCompletedWithJobID(response:String)
@@ -213,7 +213,7 @@ HODClient library requires the Swift 2.0 or newer.
         var jsonError: NSError?
         let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding);
         let json = NSJSONSerialization.JSONObjectWithData(data!, options: nil, error: &jsonError) as! NSDictionary
-        
+
         if let unwrappedError = jsonError {
             println("json error: \(unwrappedError)")
         } else {
@@ -225,37 +225,37 @@ HODClient library requires the Swift 2.0 or newer.
 ## API callback functions
 In your class, you will need to inherit the HODClientDelegate protocol and implement delegated functions to receive responses from the server
 
-    class MyAppClass : HODClientDelegate { 
-        
+    class MyAppClass : HODClientDelegate {
+
         hodClient.delegate = self
-    
+
         func requestCompletedWithJobID(response:String){ }
-    
+
         func requestCompletedWithContent(var response:String){ }
-    
+
         func onErrorOccurred(errorMessage:String){ }
-    
+
     }
-# 
+#
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response will be returned to this callback function. The response is a JSON string containing the jobID.
 
     func requestCompletedWithJobID(response:String)
-    { 
-    
+    {
+
     }
-# 
+#
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult() function, the response will be returned to this callback function. The response is a JSON string containing the actual result of the service.
 
     func requestCompletedWithContent(var response:String)
-    { 
-    
+    {
+
     }
-# 
+#
 If there is an error occurred, the error message will be returned to this callback function.
 
     func onErrorOccurred(errorMessage:String)
-    { 
-    
+    {
+
     }
 ----
 ## HODResponseParser API References
@@ -280,11 +280,11 @@ If there is an error occurred, the error message will be returned to this callba
 
     ParseJobID(jsonStr:String) -> String?
 
-*Description:* 
+*Description:*
 
 * Parses a jobID from a json string returned from an asynchronous API call.
 
-*Parameters:* 
+*Parameters:*
 
 * jsonStr: a json string returned from an asynchronous API call.
 
@@ -293,7 +293,7 @@ If there is an error occurred, the error message will be returned to this callba
 * The jobID or nil if not found.
 
 *Example code:*
-## 
+##
     func requestCompletedWithJobID(response:String) {
         let jobID : String? = hodParser.ParseJobID(response)
         if jobID != nil {
@@ -306,13 +306,13 @@ If there is an error occurred, the error message will be returned to this callba
 
     ParseSpeechRecognitionResponse(&jsonStr) -> SpeechRecognitionResponse?
 
-*Description:* 
+*Description:*
 
 * Parses a json response from Haven OnDemand Speech Recognition API and returns a SpeechRegconitionResponse object.
 
 >Note: See the full list of standard parser functions from the Standard response parser functions section at the end of this document.
 
-*Parameters:* 
+*Parameters:*
 
 * jsonStr: a json string returned from a synchronous API call or from the GetJobResult() or GetJobStatus() function.
 
@@ -321,7 +321,7 @@ If there is an error occurred, the error message will be returned to this callba
 * An object containing API's response values. If there is an error or if the job is not completed (callback from a GetJobStatus call), the returned object is nil and the error or job status can be accessed by calling the GetLastError() function.
 
 *Example code:*
-## 
+##
     func requestCompletedWithContent(var response:String) {
         if let resp = (hodParser.ParseSentimentAnalysisResponse(&response)) {
             var result = "Positive:\n"
@@ -370,17 +370,17 @@ If there is an error occurred, the error message will be returned to this callba
             }
         }        
     }
-    
+
 ----
 **Function ParseCustomResponse**
 
     ParseCustomResponse(inout jsonStr:String) -> NSDictionary?
 
-*Description:* 
+*Description:*
 
-* Parses a json string and returns the result as an NSDictionary object. You will need to define a custom class and parse the result into that class. See example below for more details. 
+* Parses a json string and returns the result as an NSDictionary object. You will need to define a custom class and parse the result into that class. See example below for more details.
 
-*Parameters:* 
+*Parameters:*
 
 * jsonStr: a json string returned from a synchronous API call or from the GetJobResult() or GetJobStatus() function.
 
@@ -389,7 +389,7 @@ If there is an error occurred, the error message will be returned to this callba
 * A NSDictionary object containing API's result values. If there is an error or if the job is not completed (callback from a GetJobStatus call), the returned object is nil and the error or job status can be accessed by calling the GetLastError() function.
 
 *Example code:*
-## 
+##
     // Define a custom class to hold entity extraction API's response
     public class EntityExtractionResponse:NSObject {
         var entities:NSMutableArray = [];
@@ -524,18 +524,18 @@ If there is an error occurred, the error message will be returned to this callba
             }
         }
     }
-    
+
 ----
 **Function GetLastError**
 
     GetLastError() -> NSMutableArray
 
-*Description:* 
+*Description:*
 
 * Get the latest error(s) if any happened during parsing the json string or HOD error returned from HOD server.
-> Note: The job "queued" or "in progress" status is also considered as an error situation. See the example below for how to detect and handle error status. 
+> Note: The job "queued" or "in progress" status is also considered as an error situation. See the example below for how to detect and handle error status.
 
-*Parameters:* 
+*Parameters:*
 
 * None.
 
@@ -544,7 +544,7 @@ If there is an error occurred, the error message will be returned to this callba
 * A NSMutableArray contains HODErrorObject.
 
 *Example code:*
-## 
+##
     let errors = hodParser.GetLastError()
     var errorMsg = ""
     for error in errors {
@@ -566,20 +566,20 @@ If there is an error occurred, the error message will be returned to this callba
     }
 
 ----
-## Demo code 1: 
+## Demo code 1:
 
 **Use the Entity Extraction API to extract people and places from cnn.com website with a synchronous GET request**
 
-    class MyAppClass : HODClientDelegate { 
+    class MyAppClass : HODClientDelegate {
         var hodClient:HODClient = HODClient(apiKey: "your-api-key")
         hodClient.delegate = self
         var hodParser:HODResponseParser = HODResponseParser()
         var hodApp = ""
-        
+
         func useHODClient() {
             var hodApp = hodClient.hodApps.ENTITY_EXTRACTION
             var params =  Dictionary<String,Object>()
-            
+
             params["url"] = "http://www.cnn.com"
             params["entity_type"] = ["people_eng","places_eng"]
             params["unique_entities"] = "true"
@@ -603,7 +603,7 @@ If there is an error occurred, the error message will be returned to this callba
                         // parse any other interested information about this place ...
                     }     
                 }
-                
+
             } else {
                 checkErrorInResponse()
             }
@@ -620,8 +620,8 @@ If there is an error occurred, the error message will be returned to this callba
             }
             println(errorStr)
         }
-        
-        func onErrorOccurred(errorMessage:String){ 
+
+        func onErrorOccurred(errorMessage:String){
             // handle error if any
         }
     }
@@ -629,7 +629,7 @@ If there is an error occurred, the error message will be returned to this callba
 ----
 
 ## Demo code 2:
- 
+
 **Use the OCR Document API to scan text from an image with an asynchronous POST request**
 
     class MyAppClass : HODClientDelegate {     
@@ -650,8 +650,8 @@ If there is an error occurred, the error message will be returned to this callba
         /**************************************************************************************
         * An async request will result in a response with a jobID. We parse the response to get
         * the jobID and send a request for the actual content identified by the jobID.
-        **************************************************************************************/ 
-        func requestCompletedWithJobID(response:String){ 
+        **************************************************************************************/
+        func requestCompletedWithJobID(response:String){
             let jobID:String? = hodParser.ParseJobID(response)
             if jobID != nil {
                 hodClient.GetJobStatus(jobID!)
@@ -689,7 +689,7 @@ If there is an error occurred, the error message will be returned to this callba
                 }
             }
         }
-        func onErrorOccurred(errorMessage:String){ 
+        func onErrorOccurred(errorMessage:String){
             // handle error if any
         }
     }
