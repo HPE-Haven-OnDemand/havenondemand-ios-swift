@@ -14,7 +14,7 @@ HODClient library requires the Swift 2.0 or newer.
 
 ----
 ## Integrate HODClient into iOS Swift project from  Cocoapods
-1. Follow instruction from this page https://guides.cocoapods.org/using/using-cocoapods.html
+1. Follow instructions from this page to install and initialize CocoaPods: https://guides.cocoapods.org/using/using-cocoapods.html
 2. Open the PodFile and edit it as follows:
 
 ```
@@ -22,7 +22,7 @@ HODClient library requires the Swift 2.0 or newer.
     use_frameworks!
     
     target 'YourApp' do
-    pod 'havenondemand', '1.0.0'
+    pod 'havenondemand', '~> 1.0.0'
     end
 ```
 3. Open YourApp.xcworkspace and build.
