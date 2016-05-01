@@ -26,8 +26,8 @@ public class HODErrorObject:NSObject
 }
 
 /************************************************************/
-//////////////////////////////////////////////////////////////
-/************************************************************/
+ //////////////////////////////////////////////////////////////
+ /************************************************************/
 public class SpeechRecognitionResponse : NSObject{
     public var document:NSMutableArray = [] // Document
     init(json : NSDictionary) {
@@ -54,8 +54,10 @@ public class SpeechRecognitionResponse : NSObject{
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -74,8 +76,10 @@ public class CancelConnectorScheduleResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -126,8 +130,10 @@ public class ConnectorHistoryResponse:NSObject {
                         self.document_counts = Document_counts(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -144,8 +150,10 @@ public class ConnectorHistoryResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -185,8 +193,10 @@ public class ConnectorStatusResponse:NSObject {
                     }
                 }
             } else {
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -203,8 +213,10 @@ public class ConnectorStatusResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -218,8 +230,10 @@ public class ConnectorStatusResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -246,8 +260,10 @@ public class CreateConnectorResponse:NSObject {
                     }
                 }
             } else {
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -263,8 +279,10 @@ public class CreateConnectorResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -282,8 +300,10 @@ public class DeleteConnectorResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -305,8 +325,10 @@ public class RetrieveConnectorConfigurationFileResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -333,8 +355,10 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
                     }
                 }
             } else {
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -370,8 +394,10 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
                     if keyName == "description" {
                         keyName = "_description"
                     }
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -386,8 +412,10 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -400,8 +428,10 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -431,8 +461,10 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
                 super.init()
                 for (key, value) in json {
                     let keyName:String = (key as? String)!
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -446,12 +478,15 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
     }
+    
     public class CredentialsPolicy:NSObject
     {
         public var notification_email:String = ""
@@ -459,8 +494,10 @@ public class RetrieveConnectorConfigurationAttrResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -479,8 +516,10 @@ public class StartConnectorResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -497,8 +536,10 @@ public class StopConnectorResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -515,8 +556,10 @@ public class UpdateConnectorResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -551,8 +594,10 @@ public class ExpandContainerResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -569,8 +614,10 @@ public class StoreObjectResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -586,8 +633,10 @@ public class ViewDocumentResponse:NSObject {
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -615,7 +664,7 @@ public class GetCommonNeighborsResponse:NSObject
             }
         }
     }
-
+    
     public class Nodes:NSObject
     {
         public var attributes:Attributes!
@@ -632,8 +681,10 @@ public class GetCommonNeighborsResponse:NSObject
                         self.attributes = Attributes(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -646,8 +697,10 @@ public class GetCommonNeighborsResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -676,7 +729,6 @@ public class GetNeighborsResponse:NSObject
             }
         }
     }
-    
     public class Neighbors:NSObject
     {
         public var target: TargetOrSource!
@@ -723,8 +775,10 @@ public class GetNeighborsResponse:NSObject
                         self.attributes = Attributes(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -737,8 +791,10 @@ public class GetNeighborsResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -757,8 +813,10 @@ public class GetNeighborsResponse:NSObject
                         self.attributes = Attributes(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -792,7 +850,7 @@ public class GetNodesResponse:NSObject
     {
         public var attributes: Attributes!
         public var id: Int64 = 0 //(integer )  Node ID
-        public var sort_value: Double = 0.0 //(number , optional)  
+        public var sort_value: Double = 0.0 //(number , optional)
         init(json:NSDictionary) {
             super.init()
             for (key, value) in json {
@@ -803,8 +861,10 @@ public class GetNodesResponse:NSObject
                         self.attributes = Attributes(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -817,8 +877,10 @@ public class GetNodesResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -869,8 +931,10 @@ public class GetShortestPathResponse:NSObject
                         self.attributes = Attributes(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -884,8 +948,10 @@ public class GetShortestPathResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -905,8 +971,10 @@ public class GetShortestPathResponse:NSObject
                         self.attributes = Attributes(json:keyValue)
                     }
                 } else {
-                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                    if let v = checkValue(value) {
+                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                            self.setValue(v, forKey: keyName)
+                        }
                     }
                 }
             }
@@ -942,7 +1010,7 @@ public class GetSubgraphResponse:NSObject
             }
         }
     }
-
+    
     public class Edges:NSObject
     {
         public var attributes: Attributes!
@@ -957,9 +1025,9 @@ public class GetSubgraphResponse:NSObject
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                         self.attributes = Attributes(json:keyValue)
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -973,8 +1041,10 @@ public class GetSubgraphResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -993,9 +1063,9 @@ public class GetSubgraphResponse:NSObject
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                         self.attributes = Attributes(json:keyValue)
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1065,9 +1135,9 @@ public class SuggestLinksResponse:NSObject
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                         self.attributes = Attributes(json:keyValue)
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1081,8 +1151,10 @@ public class SuggestLinksResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1102,9 +1174,9 @@ public class SuggestLinksResponse:NSObject
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                         self.attributes = Attributes(json:keyValue)
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1135,9 +1207,9 @@ public class SummarizeGraphResponse:NSObject
                         }
                     }
                 }
-            } else {
+            } else if let v = checkValue(value) {
                 if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                    self.setValue(v, forKey: keyName)
                 }
             }
         }
@@ -1152,8 +1224,10 @@ public class SummarizeGraphResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1193,8 +1267,10 @@ public class OCRDocumentResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1242,9 +1318,9 @@ public class RecognizeBarcodesResponse:NSObject {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                         self.additional_information = AdditionalInformation(json:keyValue)
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1258,8 +1334,10 @@ public class RecognizeBarcodesResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1306,9 +1384,9 @@ public class RecognizeImagesResponse : NSObject{
                             self.corners.addObject(c)
                         }
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1321,8 +1399,10 @@ public class RecognizeImagesResponse : NSObject{
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1370,9 +1450,9 @@ public class DetectFacesResponse : NSObject {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
                         self.additional_information = AdditionalInformation(json:keyValue)
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1384,12 +1464,13 @@ public class DetectFacesResponse : NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
-        
     }
 }
 //////////////////////----------------////////////////////////
@@ -1429,8 +1510,10 @@ public class PredictResponse:NSObject {
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1527,9 +1610,9 @@ public class RecommendResponse:NSObject
                             self.recommendation.addObject(c)
                         }
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -1544,8 +1627,10 @@ public class RecommendResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1565,8 +1650,10 @@ public class TrainPredictorResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -1585,8 +1672,10 @@ public class CreateQueryProfileResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -1605,8 +1694,10 @@ public class DeleteQueryProfileResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -1658,11 +1749,13 @@ public class RetrieveQueryProfileResponse:NSObject
                     }
                 }
             } else {
-                if keyName == "description" {
-                    keyName = "_description"
-                }
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if keyName == "description" {
+                        keyName = "_description"
+                    }
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1682,8 +1775,10 @@ public class UpdateQueryProfileResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -1723,8 +1818,10 @@ public class FindRelatedConceptsResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1787,8 +1884,10 @@ public class ExtractConceptsResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1826,8 +1925,10 @@ public class ExpandTermsResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1846,8 +1947,10 @@ public class HighlightTextResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -1878,9 +1981,9 @@ public class IdentifyLanguageResponse:NSObject
                         }
                     }
                 }
-            } else {
+            } else if let v = checkValue(value) {
                 if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                    self.setValue(v, forKey: keyName)
                 }
             }
         }
@@ -1924,12 +2027,14 @@ public class TokenizeTextResponse:NSObject
         init(json:NSDictionary) {
             super.init()
             for (key, value) in json {
-                var keyName:String = (key as? String)!
-                if keyName == "case" {
-                    keyName = "_case"
-                }
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    var keyName:String = (key as? String)!
+                    if keyName == "case" {
+                        keyName = "_case"
+                    }
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -1983,8 +2088,10 @@ public class SentimentAnalysisResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -2003,8 +2110,10 @@ public class SentimentAnalysisResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -2034,9 +2143,9 @@ public class AddToTextIndexResponse:NSObject
                         }
                     }
                 }
-            } else {
+            } else if let v = checkValue(value) {
                 if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                    self.setValue(v, forKey: keyName)
                 }
             }
         }
@@ -2049,12 +2158,14 @@ public class AddToTextIndexResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
-
+        
     }
 }
 //////////////////////----------------////////////////////////
@@ -2071,8 +2182,10 @@ public class CreateTextIndexResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -2092,10 +2205,10 @@ public class DeleteTextIndexResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
-            
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -2114,8 +2227,10 @@ public class DeleteFromTextIndexResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -2135,12 +2250,14 @@ public class IndexStatusResponse:NSObject
     init(json: NSDictionary) {
         super.init()
         for (key, value) in json {
-            var keyName:String = (key as? String)!
-            if keyName == "24hr_index_updates" {
-                keyName = "_24hr_index_updates"
-            }
-            if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                self.setValue(value, forKey: keyName)
+            if let v = checkValue(value) {
+                var keyName:String = (key as? String)!
+                if keyName == "24hr_index_updates" {
+                    keyName = "_24hr_index_updates"
+                }
+                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                    self.setValue(v, forKey: keyName)
+                }
             }
         }
     }
@@ -2188,17 +2305,13 @@ public class ListResourcesResponse:NSObject
         init(json: NSDictionary) {
             super.init()
             for (key, value) in json {
-                var keyValue:AnyObject?
-                if let _ = value as? String {
+                if let v = checkValue(value) {
                     var keyName:String = (key as? String)!
-                    keyValue = (value as? String)!
                     if keyName == "description" {
                         keyName = "_description"
                     }
-                    if keyValue != nil {
-                        if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                            self.setValue(keyValue, forKey: keyName)
-                        }
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -2216,8 +2329,10 @@ public class ListResourcesResponse:NSObject
                 if keyName == "description" {
                     keyName = "_description"
                 }
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -2236,11 +2351,9 @@ public class RestoreTextIndexResponse:NSObject
         super.init()
         for (key, value) in json {
             let keyName:String = (key as? String)!
-            var keyValue:AnyObject?
-            if let _ = value as? String {
-                keyValue = (value as? String)!
+            if let v = checkValue(value) {
                 if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(keyValue, forKey: keyName)
+                    self.setValue(v, forKey: keyName)
                 }
             }
         }
@@ -2286,9 +2399,9 @@ public class AnomalyDetectionResponse:NSObject
                             self.anomalies.addObject(p)
                         }
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -2299,7 +2412,7 @@ public class AnomalyDetectionResponse:NSObject
         public var type:String = ""
         public var anomaly_score:Double = 0.0
         public var columns:NSMutableArray = []
-
+        
         init(json: NSDictionary) {
             super.init()
             for (key, value) in json {
@@ -2312,9 +2425,9 @@ public class AnomalyDetectionResponse:NSObject
                             self.columns.addObject(p)
                         }
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -2328,8 +2441,10 @@ public class AnomalyDetectionResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
@@ -2406,9 +2521,9 @@ public class TrendAnalysisResponse:NSObject
                             self.measure.addObject(p)
                         }
                     }
-                } else {
+                } else if let v = checkValue(value) {
                     if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                        self.setValue(value, forKey: keyName)
+                        self.setValue(v, forKey: keyName)
                     }
                 }
             }
@@ -2422,11 +2537,27 @@ public class TrendAnalysisResponse:NSObject
             super.init()
             for (key, value) in json {
                 let keyName:String = (key as? String)!
-                if (self.respondsToSelector(NSSelectorFromString(keyName))) {
-                    self.setValue(value, forKey: keyName)
+                if let v = checkValue(value) {
+                    if (self.respondsToSelector(NSSelectorFromString(keyName))) {
+                        self.setValue(v, forKey: keyName)
+                    }
                 }
             }
         }
     }
 }
 //////////////////////---------------/////////////////////////
+
+// Utilities public functions
+public func checkValue(value: AnyObject) -> AnyObject?
+{
+    var keyValue:AnyObject?
+    if let _ = value as? String {
+        keyValue = (value as? String)!
+    } else if let _ = value as? Double {
+        keyValue = (value as? Double)!
+    } else if let _ = value as? Bool {
+        keyValue = (value as? Bool)!
+    }
+    return keyValue
+}
