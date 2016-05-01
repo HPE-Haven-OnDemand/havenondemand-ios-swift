@@ -17,11 +17,11 @@ HODClient library requires Swift 2.0 or newer.
 1. Follow instructions from [this](https://guides.cocoapods.org/using/using-cocoapods.html) page to install and initialize CocoaPods
 2. Run `open -a PodFile` and add the following:
 ```
-    platform :ios, '8.2'    
+    platform :ios, '8.2'
     use_frameworks!
 
     target 'YourApp' do
-    pod 'havenondemand', '~> 1.0.1'
+    pod 'havenondemand', '1.0.2'
     end
 ```
 3. Save the PodFile
@@ -126,7 +126,7 @@ HODClient library requires Swift 2.0 or newer.
     var params = Dictionary<String,AnyObject>()
     var urls = [String]()
     urls.append("http://www.cnn.com")
-    urls.append("http://www.bbc.com")    
+    urls.append("http://www.bbc.com")
     params["entity_type"] = ["people_eng","places_eng"]
     params["url"] = urls
 
@@ -368,7 +368,7 @@ If there is an error occurred, the error message will be returned to this callba
                     break
                 }
             }
-        }        
+        }
     }
 
 ----
@@ -593,7 +593,7 @@ If there is an error occurred, the error message will be returned to this callba
                 let obj = EntityExtractionResponse(json:dic)
                 var people = ""
                 var places = ""
-                for ent in obj.entities as NSArray as! [EntityExtractionResponse.Entity] {           
+                for ent in obj.entities as NSArray as! [EntityExtractionResponse.Entity] {
                     if ent.type == "people_eng" {
                         people += ent.normalized_text + "\n"
                         // parse any other interested information about this person ...
@@ -601,7 +601,7 @@ If there is an error occurred, the error message will be returned to this callba
                     else if type == "places_eng" {
                         places += ent.normalized_text + "\n"
                         // parse any other interested information about this place ...
-                    }     
+                    }
                 }
 
             } else {
@@ -632,9 +632,9 @@ If there is an error occurred, the error message will be returned to this callba
 
 **Use the OCR Document API to scan text from an image with an asynchronous POST request**
 
-    class MyAppClass : HODClientDelegate {     
-        var hodClient:HODClient = HODClient(apiKey: "your-api-key")        
-        var hodParser:HODResponseParser = HODResponseParser()        
+    class MyAppClass : HODClientDelegate {
+        var hodClient:HODClient = HODClient(apiKey: "your-api-key")
+        var hodParser:HODResponseParser = HODResponseParser()
         hodClient.delegate = self
 
         func useHODClient() {
