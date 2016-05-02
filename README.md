@@ -22,7 +22,7 @@ HODClient library requires Swift 2.0 or newer.
     use_frameworks!
 
     target 'YourApp' do
-    pod 'havenondemand', '1.0.2'
+    pod 'havenondemand', '1.0.3'
     end
 ```
 

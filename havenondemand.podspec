@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "havenondemand"
-  s.version          = "1.0.2"
+  s.version          = "1.0.3"
   s.summary          = "Easily make requests to Haven OnDemand's APIs using Swift"
   s.description      = <<-DESC
                        This library allows you to quickly and easily make requests to Haven OnDemand using Swift.
