@@ -8,19 +8,19 @@
 import Foundation
 import MobileCoreServices
 
-protocol HODClientDelegate {
-    func requestCompletedWithContent(response:String)
+public protocol HODClientDelegate {
+    func requestCompletedWithContent(var response:String)
     func requestCompletedWithJobID(response:String)
     func onErrorOccurred(errorMessage:String)
 }
 
 
 
-class HODClient : NSObject
+public class HODClient : NSObject
 {
-    enum REQ_MODE { case SYNC, ASYNC }
+    public enum REQ_MODE { case SYNC, ASYNC }
     
-    var delegate: HODClientDelegate?
+    public var delegate: HODClientDelegate?
     private var apikey : String = ""
 
     private let havenBase : String = "https://api.havenondemand.com/1/api/"
@@ -32,12 +32,12 @@ class HODClient : NSObject
     
     private var session = NSURLSession.sharedSession()
     
-    init(apiKey:String, version:String = "v1") {
+    public init(apiKey:String, version:String = "v1") {
         apikey = apiKey
         self.version = version
         session.configuration.timeoutIntervalForRequest = 600
     }
-    internal func GetJobResult(jobID:String)
+    public func GetJobResult(jobID:String)
     {
         if !isBusy {
             let queryStr:String = String(format: "%@%@?apikey=%@", arguments: [havenJobResult,jobID,apikey])
@@ -49,7 +49,7 @@ class HODClient : NSObject
             sendRequest(request)
         }
     }
-    internal func GetJobStatus(jobID:String)
+    public func GetJobStatus(jobID:String)
     {
         if !isBusy {
             let queryStr:String = String(format: "%@%@?apikey=%@", arguments: [havenJobStatus,jobID,apikey])
@@ -61,7 +61,7 @@ class HODClient : NSObject
             sendRequest(request)
         }
     }
-    internal func GetRequest(inout params:Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
+    public func GetRequest(inout params:Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
     {
         if !isBusy {
             var endPoint:String = havenBase
@@ -98,7 +98,7 @@ class HODClient : NSObject
             sendRequest(request)
         }
     }
-    internal func PostRequest(inout params : Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
+    public func PostRequest(inout params : Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
     {
         if !isBusy {
             var queryStr:String = havenBase
@@ -255,82 +255,82 @@ extension String
         return self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
     }
 }
-struct HODApps {
-    static let RECOGNIZE_SPEECH = "recognizespeech"
+public struct HODApps {
+    public static let RECOGNIZE_SPEECH = "recognizespeech"
     
-    static let CANCEL_CONNECTOR_SCHEDULE = "cancelconnectorschedule"
-    static let CONNECTOR_HISTORY = "connectorhistory"
-    static let CONNECTOR_STATUS = "connectorstatus"
-    static let CREATE_CONNECTOR = "createconnector"
-    static let DELETE_CONNECTOR = "deleteconnector"
-    static let RETRIEVE_CONFIG = "retrieveconfig"
-    static let START_CONNECTOR = "startconnector"
-    static let STOP_CONNECTOR = "stopconnector"
-    static let UPDATE_CONNECTOR = "updateconnector"
+    public static let CANCEL_CONNECTOR_SCHEDULE = "cancelconnectorschedule"
+    public static let CONNECTOR_HISTORY = "connectorhistory"
+    public static let CONNECTOR_STATUS = "connectorstatus"
+    public static let CREATE_CONNECTOR = "createconnector"
+    public static let DELETE_CONNECTOR = "deleteconnector"
+    public static let RETRIEVE_CONFIG = "retrieveconfig"
+    public static let START_CONNECTOR = "startconnector"
+    public static let STOP_CONNECTOR = "stopconnector"
+    public static let UPDATE_CONNECTOR = "updateconnector"
     
-    static let EXPAND_CONTAINER = "expandcontainer"
-    static let STORE_OBJECT = "storeobject"
-    static let EXTRACT_TEXT = "extracttext"
-    static let VIEW_DOCUMENT = "viewdocument"
+    public static let EXPAND_CONTAINER = "expandcontainer"
+    public static let STORE_OBJECT = "storeobject"
+    public static let EXTRACT_TEXT = "extracttext"
+    public static let VIEW_DOCUMENT = "viewdocument"
     
-    static let OCR_DOCUMENT = "ocrdocument"
-    static let RECOGNIZE_BARCODES = "recognizebarcodes"
-    static let DETECT_FACES = "detectfaces"
-    static let RECOGNIZE_IMAGES = "recognizeimages"
+    public static let OCR_DOCUMENT = "ocrdocument"
+    public static let RECOGNIZE_BARCODES = "recognizebarcodes"
+    public static let DETECT_FACES = "detectfaces"
+    public static let RECOGNIZE_IMAGES = "recognizeimages"
     
-    static let GET_COMMON_NEIGHBORS = "getcommonneighbors"
-    static let GET_NEIGHBORS = "getneighbors"
-    static let GET_NODES = "getnodes"
-    static let GET_SHORTEST_PATH = "getshortestpath"
-    static let GET_SUB_GRAPH = "getsubgraph"
-    static let SUGGEST_LINKS = "suggestlinks"
-    static let SUMMARIZE_GRAPH = "summarizegraph"
+    public static let GET_COMMON_NEIGHBORS = "getcommonneighbors"
+    public static let GET_NEIGHBORS = "getneighbors"
+    public static let GET_NODES = "getnodes"
+    public static let GET_SHORTEST_PATH = "getshortestpath"
+    public static let GET_SUB_GRAPH = "getsubgraph"
+    public static let SUGGEST_LINKS = "suggestlinks"
+    public static let SUMMARIZE_GRAPH = "summarizegraph"
     
-    static let ANOMALY_DETECTION = "anomalydetection"
-    static let TREND_ANALYSIS = "trendanalysis"
+    public static let ANOMALY_DETECTION = "anomalydetection"
+    public static let TREND_ANALYSIS = "trendanalysis"
     
-    static let CREATE_CLASSIFICATION_OBJECTS = "createclassificationobjects"
-    static let CREATE_POLICY_OBJECTS = "createpolicyobjects"
-    static let DELETE_CLASSIFICATION_OBJECTS = "deleteclassificationobjects"
-    static let DELETE_POLICY_OBJECTS = "deletepolicyobjects"
-    static let RETRIEVE_CLASSIFICATION_OBJECTS = "retrieveclassificationobjects"
-    static let RETRIEVE_POLICY_OBJECTS = "retrievepolicyobjects"
-    static let UPDATE_CLASSIFICATION_OBJECTS = "updateclassificationobjects"
-    static let UPDATE_POLICY_OBJECTS = "updatepolicyobjects"
+    public static let CREATE_CLASSIFICATION_OBJECTS = "createclassificationobjects"
+    public static let CREATE_POLICY_OBJECTS = "createpolicyobjects"
+    public static let DELETE_CLASSIFICATION_OBJECTS = "deleteclassificationobjects"
+    public static let DELETE_POLICY_OBJECTS = "deletepolicyobjects"
+    public static let RETRIEVE_CLASSIFICATION_OBJECTS = "retrieveclassificationobjects"
+    public static let RETRIEVE_POLICY_OBJECTS = "retrievepolicyobjects"
+    public static let UPDATE_CLASSIFICATION_OBJECTS = "updateclassificationobjects"
+    public static let UPDATE_POLICY_OBJECTS = "updatepolicyobjects"
     
-    static let PREDICT = "predict"
-    static let RECOMMEND = "recommend"
-    static let TRAIN_PREDICTOR = "trainpredictor"
+    public static let PREDICT = "predict"
+    public static let RECOMMEND = "recommend"
+    public static let TRAIN_PREDICTOR = "trainpredictor"
     
-    static let CREATE_QUERY_PROFILE = "createqueryprofile"
-    static let DELETE_QUERY_PROFILE = "deletequeryprofile"
-    static let RETRIEVE_QUERY_PROFILE = "retrievequeryprofile"
-    static let UPDATE_QUERY_PROFILE = "updatequeryprofile"
+    public static let CREATE_QUERY_PROFILE = "createqueryprofile"
+    public static let DELETE_QUERY_PROFILE = "deletequeryprofile"
+    public static let RETRIEVE_QUERY_PROFILE = "retrievequeryprofile"
+    public static let UPDATE_QUERY_PROFILE = "updatequeryprofile"
     
-    static let FIND_RELATED_CONCEPTS = "findrelatedconcepts"
-    static let FIND_SIMILAR = "findsimilar"
-    static let GET_CONTENT = "getcontent"
-    static let GET_PARAMETRIC_VALUES = "getparametricvalues"
-    static let QUERY_TEXT_INDEX = "querytextindex"
-    static let RETRIEVE_INDEX_FIELDS = "retrieveindexfields"
+    public static let FIND_RELATED_CONCEPTS = "findrelatedconcepts"
+    public static let FIND_SIMILAR = "findsimilar"
+    public static let GET_CONTENT = "getcontent"
+    public static let GET_PARAMETRIC_VALUES = "getparametricvalues"
+    public static let QUERY_TEXT_INDEX = "querytextindex"
+    public static let RETRIEVE_INDEX_FIELDS = "retrieveindexfields"
     
-    static let AUTO_COMPLETE = "autocomplete"
-    static let CLASSIFY_DOCUMENT = "classifydocument"
-    static let EXTRACT_CONCEPTS = "extractconcepts"
-    static let CATEGORIZE_DOCUMENT = "categorizedocument"
-    static let ENTITY_EXTRACTION = "extractentities"
-    static let EXPAND_TERMS = "expandterms"
-    static let HIGHLIGHT_TEXT = "highlighttext"
-    static let IDENTIFY_LANGUAGE = "identifylanguage"
-    static let ANALYZE_SENTIMENT = "analyzesentiment"
-    static let TOKENIZE_TEXT = "tokenizetext"
+    public static let AUTO_COMPLETE = "autocomplete"
+    public static let CLASSIFY_DOCUMENT = "classifydocument"
+    public static let EXTRACT_CONCEPTS = "extractconcepts"
+    public static let CATEGORIZE_DOCUMENT = "categorizedocument"
+    public static let ENTITY_EXTRACTION = "extractentities"
+    public static let EXPAND_TERMS = "expandterms"
+    public static let HIGHLIGHT_TEXT = "highlighttext"
+    public static let IDENTIFY_LANGUAGE = "identifylanguage"
+    public static let ANALYZE_SENTIMENT = "analyzesentiment"
+    public static let TOKENIZE_TEXT = "tokenizetext"
     
-    static let ADD_TO_TEXT_INDEX = "addtotextindex"
-    static let CREATE_TEXT_INDEX = "createtextindex"
-    static let DELETE_TEXT_INDEX = "deletetextindex"
-    static let DELETE_FROM_TEXT_INDEX = "deletefromtextindex"
-    static let INDEX_STATUS = "indexstatus"
-    //static let LIST_INDEXES = "listindexes" REMOVED
-    static let LIST_RESOURCES = "listresources"
-    static let RESTORE_TEXT_INDEX = "restoretextindex"
+    public static let ADD_TO_TEXT_INDEX = "addtotextindex"
+    public static let CREATE_TEXT_INDEX = "createtextindex"
+    public static let DELETE_TEXT_INDEX = "deletetextindex"
+    public static let DELETE_FROM_TEXT_INDEX = "deletefromtextindex"
+    public static let INDEX_STATUS = "indexstatus"
+    //public static let LIST_INDEXES = "listindexes" REMOVED
+    public static let LIST_RESOURCES = "listresources"
+    public static let RESTORE_TEXT_INDEX = "restoretextindex"
 }
