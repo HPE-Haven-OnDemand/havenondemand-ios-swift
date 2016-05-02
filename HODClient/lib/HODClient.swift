@@ -47,7 +47,9 @@ public class HODClient : NSObject
             request.HTTPMethod = "GET"
             isBusy = true
             sendRequest(request)
-        }
+        } else {
+            self.delegate?.onErrorOccurred("Busy. Previous operation is in progress.")
+	}
     }
     public func GetJobStatus(jobID:String)
     {
@@ -59,7 +61,9 @@ public class HODClient : NSObject
             request.HTTPMethod = "GET"
             isBusy = true
             sendRequest(request)
-        }
+        } else {
+            self.delegate?.onErrorOccurred("Busy. Previous operation is in progress.")
+	}
     }
     public func GetRequest(inout params:Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
     {
@@ -96,7 +100,9 @@ public class HODClient : NSObject
             request.HTTPMethod = "GET"
             isBusy = true
             sendRequest(request)
-        }
+        } else {
+            self.delegate?.onErrorOccurred("Busy. Previous operation is in progress.")
+	}
     }
     public func PostRequest(inout params : Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
     {
@@ -124,7 +130,9 @@ public class HODClient : NSObject
                 isBusy = true
                 sendRequest(request)
             }
-        }
+        } else {
+            self.delegate?.onErrorOccurred("Busy. Previous operation is in progress.")
+	}
     }
     /********
     // private functions
