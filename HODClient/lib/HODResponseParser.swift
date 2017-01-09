@@ -17,39 +17,36 @@ public struct HODErrorCode {
     static let UNKNOWN_ERROR = 1660
 }
 
-public class HODResponseParser
+class HODResponseParser
 {
     var hodErrors : NSMutableArray = []
-
-    public init() {
-        
-    }
-    public func GetLastError() -> NSMutableArray
+    
+    func GetLastError() -> NSMutableArray
     {
         return hodErrors
     }
-    private func resetErrors()
+    fileprivate func resetErrors()
     {
         hodErrors.removeAllObjects()
     }
-    private func addError(error : HODErrorObject)
+    fileprivate func addError(_ error : HODErrorObject)
     {
-        hodErrors.addObject(error)
+        hodErrors.add(error)
     }
-
-    public func ParseJobID(jsonStr:String) -> String?
+    
+    func ParseJobID(_ jsonStr:String) -> String?
     {
         var jobID : String?
         
         if (jsonStr.characters.count != 0) {
-            let resStr = jsonStr.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-            let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding)
+            let resStr = jsonStr.trimmingCharacters(in: CharacterSet.whitespaces)
+            let data = (resStr as NSString).data(using: String.Encoding.utf8.rawValue)
             do {
-                let json = try NSJSONSerialization.JSONObjectWithData(data!, options: [])
+                let json = try JSONSerialization.jsonObject(with: data!, options: [])
                 guard let _ :NSDictionary = json as? NSDictionary else {
                     return jobID
                 }
-                jobID = json.valueForKey("jobID") as? String
+                jobID = (json as AnyObject).value(forKey: "jobID") as? String
             }
             catch {
                 return jobID
@@ -57,77 +54,70 @@ public class HODResponseParser
         }
         return jobID
     }
-    public func getResult(inout jsonStr:String) -> String?
+
+    fileprivate func getResult(_ jsonStr:inout String) -> String?
     {
         resetErrors()
         var result = jsonStr
         if (jsonStr.characters.count == 0) {
             let err = String(format: "%@%d%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"Empty response.\"}"])
-            let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            let jsonObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+            let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+            let jsonObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
             let hodError = HODErrorObject(json: jsonObj)
             addError(hodError)
             return nil
         }
-        let resStr = jsonStr.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding)
+        let resStr = jsonStr.trimmingCharacters(in: CharacterSet.whitespaces)
+        let data = (resStr as NSString).data(using: String.Encoding.utf8.rawValue)
         do {
-            let jsonObj = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments)
-            guard let _ :NSDictionary = jsonObj as? NSDictionary else {
-                let err = String(format: "%@%d%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"Invalid json response.\"}"])
-                let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let jsonObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                let hodError = HODErrorObject(json: jsonObj)
-                addError(hodError)
-                return nil
-            }
-            
+            let jsonObj = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! NSDictionary
+
             if let actions = jsonObj["actions"] as? NSArray {
-                let status = actions[0].valueForKey("status") as? String
+                let status = (actions[0] as AnyObject).value(forKey: "status") as? String
                 if status == "finished" || status == "FINISHED" {
-                    let jsonData: NSData?
+                    let jsonData: Data?
                     do {
-                        jsonData = try NSJSONSerialization.dataWithJSONObject((actions[0].valueForKey("result") as? NSDictionary)!, options: [])
-                        result = NSString(data: jsonData!, encoding: NSUTF8StringEncoding)! as String
+                        jsonData = try JSONSerialization.data(withJSONObject: ((actions[0] as AnyObject).value(forKey: "result") as? NSDictionary)!, options: [])
+                        result = NSString(data: jsonData!, encoding: String.Encoding.utf8.rawValue)! as String
                         
                     } catch let error as NSError {
                         
                         let err = String(format: "%@%d%@%@%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"", error.localizedDescription, "\"}"])
-                        let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                        let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+                        let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+                        let errorObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
                         let hodError = HODErrorObject(json: errorObj)
                         addError(hodError)
                         return nil
                     }
                 } else if status == "failed" {
-                    let errors = actions[0].valueForKey("errors") as! NSArray
+                    let errors = (actions[0] as AnyObject).value(forKey: "errors") as! NSArray
                     for item in errors {
                         let hodError = HODErrorObject(json: item as! NSDictionary)
                         addError(hodError)
                     }
                     return nil
                 } else if status == "queued" {
-                    var jobID = jsonObj.valueForKey("jobID") as? String
-                    jobID = jobID!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+                    var jobID = (jsonObj as AnyObject).value(forKey: "jobID") as? String
+                    jobID = jobID!.trimmingCharacters(in: CharacterSet.whitespaces)
                     let err = String(format: "%@%d%@%@%@", "{\"error\":", HODErrorCode.QUEUED,",\"reason\":\"Task is in queue\",\"jobID\":\"", jobID!, "\"}")
-                    let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+                    let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+                    let errorObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
                     let hodError = HODErrorObject(json: errorObj)
                     addError(hodError)
                     return nil
                 } else if status == "in progress" {
-                    var jobID = jsonObj.valueForKey("jobID") as? String
-                    jobID = jobID!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+                    var jobID = (jsonObj as AnyObject).value(forKey: "jobID") as? String
+                    jobID = jobID!.trimmingCharacters(in: CharacterSet.whitespaces)
                     let err = String(format: "%@%d%@%@%@", "{\"error\":",HODErrorCode.IN_PROGRESS,",\"reason\":\"Task is in progress\",\"jobID\":\"", jobID!, "\"}")
-                    let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+                    let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+                    let errorObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
                     let hodError = HODErrorObject(json: errorObj)
                     addError(hodError)
                     return nil
                 } else {
                     let err = String(format: "%@%d%@%@", "{\"error\":",HODErrorCode.UNKNOWN_ERROR,",\"reason\":\"", status!, "\"}")
-                    let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+                    let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+                    let errorObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
                     let hodError = HODErrorObject(json: errorObj)
                     addError(hodError)
                     return nil
@@ -135,9 +125,9 @@ public class HODResponseParser
             } else {
                 // handle error for sync mode
                 var isError = false
-                for (key, _) in jsonObj as! NSDictionary {
+                for (key, _) in jsonObj as NSDictionary {
                     if key as! String == "error" {
-                        let hodError = HODErrorObject(json: jsonObj as! NSDictionary)
+                        let hodError = HODErrorObject(json: jsonObj as NSDictionary)
                         addError(hodError)
                         isError = true
                     }
@@ -149,28 +139,28 @@ public class HODResponseParser
         }
         catch {
             let err = String(format: "%@%d%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"Invalid json response\"}"])
-            let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+            let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+            let errorObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
             let hodError = HODErrorObject(json: errorObj)
             addError(hodError)
             return nil
         }
         return result
     }
-    private func logParserError(error:NSError) {
+    fileprivate func logParserError(_ error:NSError) {
         let err = String(format: "%@%d%@%@", "{\"error\":",HODErrorCode.INVALID_HOD_RESPONSE,",\"reason\":\"", error.localizedDescription, "\"}")
-        let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-        let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
+        let errData = (err as NSString).data(using: String.Encoding.utf8.rawValue)
+        let errorObj = (try! JSONSerialization.jsonObject(with: errData!, options: [])) as! NSDictionary
         let hodError = HODErrorObject(json: errorObj)
         addError(hodError)
     }
-    public func ParseSpeechRecognitionResponse(inout jsonStr:String) -> SpeechRecognitionResponse?
+    func ParseSpeechRecognitionResponse(_ jsonStr:inout String) -> SpeechRecognitionResponse?
     {
         var obj : SpeechRecognitionResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = SpeechRecognitionResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -178,13 +168,41 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseCancelConnectorScheduleResponse(inout jsonStr:String) -> CancelConnectorScheduleResponse?
+    func ParseDetectSceneChangesResponse(_ jsonStr:inout String) -> DetectSceneChangesResponse?
+    {
+        var obj : DetectSceneChangesResponse!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = DetectSceneChangesResponse(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseLicensePlateRecognitionResponse(_ jsonStr:inout String) -> LicensePlateRecognitionResponse?
+    {
+        var obj : LicensePlateRecognitionResponse!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = LicensePlateRecognitionResponse(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseCancelConnectorScheduleResponse(_ jsonStr:inout String) -> CancelConnectorScheduleResponse?
     {
         var obj : CancelConnectorScheduleResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = CancelConnectorScheduleResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -192,13 +210,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseConnectorHistoryResponse(inout jsonStr:String) -> ConnectorHistoryResponse?
+    func ParseConnectorHistoryResponse(_ jsonStr:inout String) -> ConnectorHistoryResponse?
     {
         var obj : ConnectorHistoryResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ConnectorHistoryResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -206,13 +224,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseConnectorStatusResponse(inout jsonStr:String) -> ConnectorStatusResponse?
+    func ParseConnectorStatusResponse(_ jsonStr:inout String) -> ConnectorStatusResponse?
     {
         var obj : ConnectorStatusResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ConnectorStatusResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -220,13 +238,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseCreateConnectorResponse(inout jsonStr:String) -> CreateConnectorResponse?
+    func ParseCreateConnectorResponse(_ jsonStr:inout String) -> CreateConnectorResponse?
     {
         var obj : CreateConnectorResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = CreateConnectorResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -234,13 +252,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseDeleteConnectorResponse(inout jsonStr:String) -> DeleteConnectorResponse?
+    func ParseDeleteConnectorResponse(_ jsonStr:inout String) -> DeleteConnectorResponse?
     {
         var obj : DeleteConnectorResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = DeleteConnectorResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -248,13 +266,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRetrieveConnectorConfigurationAttrResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationAttrResponse?
+    func ParseRetrieveConnectorConfigurationAttrResponse(_ jsonStr:inout String) -> RetrieveConnectorConfigurationAttrResponse?
     {
         var obj : RetrieveConnectorConfigurationAttrResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RetrieveConnectorConfigurationAttrResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -262,13 +280,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRetrieveConnectorConfigurationFileResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationFileResponse?
+    func ParseRetrieveConnectorConfigurationFileResponse(_ jsonStr:inout String) -> RetrieveConnectorConfigurationFileResponse?
     {
         var obj : RetrieveConnectorConfigurationFileResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RetrieveConnectorConfigurationFileResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -276,13 +294,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseStartConnectorResponse(inout jsonStr:String) -> StartConnectorResponse?
+    func ParseStartConnectorResponse(_ jsonStr:inout String) -> StartConnectorResponse?
     {
         var obj : StartConnectorResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = StartConnectorResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -290,13 +308,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseStopConnectorResponse(inout jsonStr:String) -> StopConnectorResponse?
+    func ParseStopConnectorResponse(_ jsonStr:inout String) -> StopConnectorResponse?
     {
         var obj : StopConnectorResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = StopConnectorResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -304,13 +322,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseUpdateConnectorResponse(inout jsonStr:String) -> UpdateConnectorResponse?
+    func ParseUpdateConnectorResponse(_ jsonStr:inout String) -> UpdateConnectorResponse?
     {
         var obj : UpdateConnectorResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = UpdateConnectorResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -318,13 +336,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseExpandContainerResponse(inout jsonStr:String) -> ExpandContainerResponse?
+    func ParseExpandContainerResponse(_ jsonStr:inout String) -> ExpandContainerResponse?
     {
         var obj : ExpandContainerResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ExpandContainerResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -332,13 +350,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseStoreObjectResponse(inout jsonStr:String) -> StoreObjectResponse?
+    func ParseStoreObjectResponse(_ jsonStr:inout String) -> StoreObjectResponse?
     {
         var obj : StoreObjectResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = StoreObjectResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -346,13 +364,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseViewDocumentResponse(inout jsonStr:String) -> ViewDocumentResponse?
+    func ParseViewDocumentResponse(_ jsonStr:inout String) -> ViewDocumentResponse?
     {
         var obj : ViewDocumentResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ViewDocumentResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -360,13 +378,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseGetCommonNeighborsResponse(inout jsonStr:String) -> GetCommonNeighborsResponse?
+    func ParseGetCommonNeighborsResponse(_ jsonStr:inout String) -> GetCommonNeighborsResponse?
     {
         var obj : GetCommonNeighborsResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = GetCommonNeighborsResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -374,13 +392,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseGetNeighborsResponse(inout jsonStr:String) -> GetNeighborsResponse?
+    func ParseGetNeighborsResponse(_ jsonStr:inout String) -> GetNeighborsResponse?
     {
         var obj : GetNeighborsResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = GetNeighborsResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -388,13 +406,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseGetNodesResponse(inout jsonStr:String) -> GetNodesResponse?
+    func ParseGetNodesResponse(_ jsonStr:inout String) -> GetNodesResponse?
     {
         var obj : GetNodesResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = GetNodesResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -402,13 +420,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseGetShortestPathResponse(inout jsonStr:String) -> GetShortestPathResponse?
+    func ParseGetShortestPathResponse(_ jsonStr:inout String) -> GetShortestPathResponse?
     {
         var obj : GetShortestPathResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = GetShortestPathResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -416,13 +434,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseGetSubgraphResponse(inout jsonStr:String) -> GetSubgraphResponse?
+    func ParseGetSubgraphResponse(_ jsonStr:inout String) -> GetSubgraphResponse?
     {
         var obj : GetSubgraphResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = GetSubgraphResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -430,13 +448,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseSuggestLinksResponse(inout jsonStr:String) -> SuggestLinksResponse?
+    func ParseSuggestLinksResponse(_ jsonStr:inout String) -> SuggestLinksResponse?
     {
         var obj : SuggestLinksResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = SuggestLinksResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -444,13 +462,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseSummarizeGraphResponse(inout jsonStr:String) -> SummarizeGraphResponse?
+    func ParseSummarizeGraphResponse(_ jsonStr:inout String) -> SummarizeGraphResponse?
     {
         var obj : SummarizeGraphResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = SummarizeGraphResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -458,13 +476,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseOCRDocumentResponse(inout jsonStr:String) -> OCRDocumentResponse?
+    func ParseOCRDocumentResponse(_ jsonStr:inout String) -> OCRDocumentResponse?
     {
         var obj : OCRDocumentResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = OCRDocumentResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -472,13 +490,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRecognizeBarcodesResponse(inout jsonStr:String) -> RecognizeBarcodesResponse?
+    func ParseRecognizeBarcodesResponse(_ jsonStr:inout String) -> RecognizeBarcodesResponse?
     {
         var obj : RecognizeBarcodesResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RecognizeBarcodesResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -486,13 +504,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseDetectFacesResponse(inout jsonStr:String) -> DetectFacesResponse?
+    func ParseDetectFacesResponse(_ jsonStr:inout String) -> DetectFacesResponse?
     {
         var obj : DetectFacesResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = DetectFacesResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -500,13 +518,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRecognizeImagesResponse(inout jsonStr:String) -> RecognizeImagesResponse?
+    func ParseRecognizeImagesResponse(_ jsonStr:inout String) -> RecognizeImagesResponse?
     {
         var obj : RecognizeImagesResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RecognizeImagesResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -514,13 +532,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParsePredictResponse(inout jsonStr:String) -> PredictResponse?
+    func ParsePredictResponse(_ jsonStr:inout String) -> PredictResponse?
     {
         var obj : PredictResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = PredictResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -528,13 +546,27 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRecommendResponse(inout jsonStr:String) -> RecommendResponse?
+    func ParsePredictV2Response(_ jsonStr:inout String) -> PredictV2Response?
+    {
+        var obj : PredictV2Response!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = PredictV2Response(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseRecommendResponse(_ jsonStr:inout String) -> RecommendResponse?
     {
         var obj : RecommendResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RecommendResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -542,27 +574,83 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseTrainPredictorResponse(inout jsonStr:String) -> TrainPredictorResponse?
+    func ParseRecommendV2Response(_ jsonStr:inout String) -> RecommendV2Response?
     {
-        var obj : TrainPredictorResponse!
+        var obj : RecommendV2Response!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
-                obj = TrainPredictorResponse(json:dic)
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = RecommendV2Response(json:dic)
             } catch let error as NSError {
                 logParserError(error)
             }
         }
         return obj
     }
-    public func ParseCreateQueryProfileResponse(inout jsonStr:String) -> CreateQueryProfileResponse?
+    func ParseTrainPredictionResponse(_ jsonStr:inout String) -> TrainPredictionResponse?
+    {
+        var obj : TrainPredictionResponse!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = TrainPredictionResponse(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseTrainPredictionV2Response(_ jsonStr:inout String) -> TrainPredictionV2Response?
+    {
+        var obj : TrainPredictionV2Response!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = TrainPredictionV2Response(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseGetPredictionModelDetailsResponse(_ jsonStr:inout String) -> GetPredictionModelDetailsResponse?
+    {
+        var obj : GetPredictionModelDetailsResponse!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = GetPredictionModelDetailsResponse(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseDeletePredictionModelResponse(_ jsonStr:inout String) -> DeletePredictionModelResponse?
+    {
+        var obj : DeletePredictionModelResponse!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = DeletePredictionModelResponse(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseCreateQueryProfileResponse(_ jsonStr:inout String) -> CreateQueryProfileResponse?
     {
         var obj : CreateQueryProfileResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = CreateQueryProfileResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -570,13 +658,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseDeleteQueryProfileResponse(inout jsonStr:String) -> DeleteQueryProfileResponse?
+    func ParseDeleteQueryProfileResponse(_ jsonStr:inout String) -> DeleteQueryProfileResponse?
     {
         var obj : DeleteQueryProfileResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = DeleteQueryProfileResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -584,13 +672,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRetrieveQueryProfileResponse(inout jsonStr:String) -> RetrieveQueryProfileResponse?
+    func ParseRetrieveQueryProfileResponse(_ jsonStr:inout String) -> RetrieveQueryProfileResponse?
     {
         var obj : RetrieveQueryProfileResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RetrieveQueryProfileResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -598,13 +686,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseUpdateQueryProfileResponse(inout jsonStr:String) -> UpdateQueryProfileResponse?
+    func ParseUpdateQueryProfileResponse(_ jsonStr:inout String) -> UpdateQueryProfileResponse?
     {
         var obj : UpdateQueryProfileResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = UpdateQueryProfileResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -612,13 +700,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseFindRelatedConceptsResponse(inout jsonStr:String) -> FindRelatedConceptsResponse?
+    func ParseFindRelatedConceptsResponse(_ jsonStr:inout String) -> FindRelatedConceptsResponse?
     {
         var obj : FindRelatedConceptsResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = FindRelatedConceptsResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -626,13 +714,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseAutoCompleteResponse(inout jsonStr:String) -> AutoCompleteResponse?
+    func ParseAutoCompleteResponse(_ jsonStr:inout String) -> AutoCompleteResponse?
     {
         var obj : AutoCompleteResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = AutoCompleteResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -640,13 +728,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseExtractConceptsResponse(inout jsonStr:String) -> ExtractConceptsResponse?
+    func ParseExtractConceptsResponse(_ jsonStr:inout String) -> ExtractConceptsResponse?
     {
         var obj : ExtractConceptsResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ExtractConceptsResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -654,13 +742,41 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseExpandTermsResponse(inout jsonStr:String) -> ExpandTermsResponse?
+    func ParseEntityExtractionResponse(_ jsonStr:inout String) -> EntityExtractionResponse?
+    {
+        var obj : EntityExtractionResponse!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = EntityExtractionResponse(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseEntityExtractionV2Response(_ jsonStr:inout String) -> EntityExtractionV2Response?
+    {
+        var obj : EntityExtractionV2Response!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = EntityExtractionV2Response(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseExpandTermsResponse(_ jsonStr:inout String) -> ExpandTermsResponse?
     {
         var obj : ExpandTermsResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ExpandTermsResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -668,13 +784,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseHighlightTextResponse(inout jsonStr:String) -> HighlightTextResponse?
+    func ParseHighlightTextResponse(_ jsonStr:inout String) -> HighlightTextResponse?
     {
         var obj : HighlightTextResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = HighlightTextResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -682,13 +798,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseIdentifyLanguageResponse(inout jsonStr:String) -> IdentifyLanguageResponse?
+    func ParseIdentifyLanguageResponse(_ jsonStr:inout String) -> IdentifyLanguageResponse?
     {
         var obj : IdentifyLanguageResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = IdentifyLanguageResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -696,13 +812,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseSentimentAnalysisResponse(inout jsonStr:String) -> SentimentAnalysisResponse?
+    func ParseSentimentAnalysisResponse(_ jsonStr:inout String) -> SentimentAnalysisResponse?
     {
         var obj : SentimentAnalysisResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = SentimentAnalysisResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -710,13 +826,27 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseTokenizeTextResponse(inout jsonStr:String) -> TokenizeTextResponse?
+    func ParseSentimentAnalysisV2Response(_ jsonStr:inout String) -> SentimentAnalysisV2Response?
+    {
+        var obj : SentimentAnalysisV2Response!
+        if let result = getResult(&jsonStr) {
+            do {
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+                obj = SentimentAnalysisV2Response(json:dic)
+            } catch let error as NSError {
+                logParserError(error)
+            }
+        }
+        return obj
+    }
+    func ParseTokenizeTextResponse(_ jsonStr:inout String) -> TokenizeTextResponse?
     {
         var obj : TokenizeTextResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = TokenizeTextResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -724,13 +854,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseAddToTextIndexResponse(inout jsonStr:String) -> AddToTextIndexResponse?
+    func ParseAddToTextIndexResponse(_ jsonStr:inout String) -> AddToTextIndexResponse?
     {
         var obj : AddToTextIndexResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = AddToTextIndexResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -738,13 +868,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseCreateTextIndexResponse(inout jsonStr:String) -> CreateTextIndexResponse?
+    func ParseCreateTextIndexResponse(_ jsonStr:inout String) -> CreateTextIndexResponse?
     {
         var obj : CreateTextIndexResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = CreateTextIndexResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -752,13 +882,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseDeleteTextIndexResponse(inout jsonStr:String) -> DeleteTextIndexResponse?
+    func ParseDeleteTextIndexResponse(_ jsonStr:inout String) -> DeleteTextIndexResponse?
     {
         var obj : DeleteTextIndexResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = DeleteTextIndexResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -766,13 +896,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseDeleteFromTextIndexResponse(inout jsonStr:String) -> DeleteFromTextIndexResponse?
+    func ParseDeleteFromTextIndexResponse(_ jsonStr:inout String) -> DeleteFromTextIndexResponse?
     {
         var obj : DeleteFromTextIndexResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = DeleteFromTextIndexResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -780,13 +910,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseIndexStatusResponse(inout jsonStr:String) -> IndexStatusResponse?
+    func ParseIndexStatusResponse(_ jsonStr:inout String) -> IndexStatusResponse?
     {
         var obj : IndexStatusResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = IndexStatusResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -794,13 +924,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseListResourcesResponse(inout jsonStr:String) -> ListResourcesResponse?
+    func ParseListResourcesResponse(_ jsonStr:inout String) -> ListResourcesResponse?
     {
         var obj : ListResourcesResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = ListResourcesResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -808,13 +938,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseRestoreTextIndexResponse(inout jsonStr:String) -> RestoreTextIndexResponse?
+    func ParseRestoreTextIndexResponse(_ jsonStr:inout String) -> RestoreTextIndexResponse?
     {
         var obj : RestoreTextIndexResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = RestoreTextIndexResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -822,13 +952,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseAnomalyDetectionResponse(inout jsonStr:String) -> AnomalyDetectionResponse?
+    func ParseAnomalyDetectionResponse(_ jsonStr:inout String) -> AnomalyDetectionResponse?
     {
         var obj : AnomalyDetectionResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = AnomalyDetectionResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -836,13 +966,13 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseTrendAnalysisResponse(inout jsonStr:String) -> TrendAnalysisResponse?
+    func ParseTrendAnalysisResponse(_ jsonStr:inout String) -> TrendAnalysisResponse?
     {
         var obj : TrendAnalysisResponse!
         if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let dic = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                let dic = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
                 obj = TrendAnalysisResponse(json:dic)
             } catch let error as NSError {
                 logParserError(error)
@@ -850,116 +980,19 @@ public class HODResponseParser
         }
         return obj
     }
-    public func ParseCustomResponse(inout jsonStr:String) -> NSDictionary?
+    
+    func ParseCustomResponse(_ jsonStr:inout String) -> NSDictionary?
     {
         resetErrors()
         var obj : NSDictionary!
-        if (jsonStr.characters.count == 0) {
-            let err = String(format: "%@%d%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"Empty response.\"}"])
-            let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            let jsonObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-            let hodError = HODErrorObject(json: jsonObj)
-            addError(hodError)
-            return nil
-        }
-        let resStr = jsonStr.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-        do {
-            let jsonObj = try NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments)
-            guard let _ :NSDictionary = jsonObj as? NSDictionary else {
-                let err = String(format: "%@%d%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"Invalid json response.\"}"])
-                let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let jsonObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                let hodError = HODErrorObject(json: jsonObj)
-                addError(hodError)
-                return nil
-            }
-            
-            var result = jsonStr
-            
-            if let actions = jsonObj["actions"] as? NSArray {
-                let status = actions[0].valueForKey("status") as? String
-                if status == "finished" || status == "FINISHED" {
-                    let jsonData: NSData?
-                    do {
-                        jsonData = try NSJSONSerialization.dataWithJSONObject((actions[0].valueForKey("result") as? NSDictionary)!, options: [])
-                        result = NSString(data: jsonData!, encoding: NSUTF8StringEncoding)! as String
-                        
-                    } catch let error as NSError {
-                        
-                        let err = String(format: "%@%d%@%@%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"", error.localizedDescription, "\"}"])
-                        let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                        let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                        let hodError = HODErrorObject(json: errorObj)
-                        addError(hodError)
-                        return nil
-                    }
-                } else if status == "failed" {
-                    let errors = actions[0].valueForKey("errors") as! NSArray
-                    for item in errors {
-                        let hodError = HODErrorObject(json: item as! NSDictionary)
-                        addError(hodError)
-                    }
-                    return nil
-                } else if status == "queued" {
-                    var jobID = jsonObj.valueForKey("jobID") as? String
-                    jobID = jobID!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-                    let err = String(format: "%@%d%@%@%@", "{\"error\":", HODErrorCode.QUEUED,",\"reason\":\"Task is in queue\",\"jobID\":\"", jobID!, "\"}")
-                    let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                    let hodError = HODErrorObject(json: errorObj)
-                    addError(hodError)
-                    return nil
-                } else if status == "in progress" {
-                    var jobID = jsonObj.valueForKey("jobID") as? String
-                    jobID = jobID!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-                    let err = String(format: "%@%d%@%@%@", "{\"error\":",HODErrorCode.IN_PROGRESS,",\"reason\":\"Task is in progress\",\"jobID\":\"", jobID!, "\"}")
-                    let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                    let hodError = HODErrorObject(json: errorObj)
-                    addError(hodError)
-                    return nil
-                } else {
-                    let err = String(format: "%@%d%@%@", "{\"error\":",HODErrorCode.UNKNOWN_ERROR,",\"reason\":\"", status!, "\"}")
-                    let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                    let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                    let hodError = HODErrorObject(json: errorObj)
-                    addError(hodError)
-                    return nil
-                }
-            } else {
-                // handle error for sync mode
-                var isError = false
-                for (key, _) in jsonObj as! NSDictionary {
-                    if key as! String == "error" {
-                        let hodError = HODErrorObject(json: jsonObj as! NSDictionary)
-                        addError(hodError)
-                        isError = true
-                    }
-                }
-                if isError {
-                    return nil
-                }
-            }
+        if let result = getResult(&jsonStr) {
             do {
-                let data1 = (result as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                obj = try NSJSONSerialization.JSONObjectWithData(data1!, options: []) as! NSDictionary
+                let data1 = (result as NSString).data(using: String.Encoding.utf8.rawValue)
+                obj = try JSONSerialization.jsonObject(with: data1!, options: []) as! NSDictionary
+
             } catch let error as NSError {
-                let err = String(format: "%@%d%@%@", "{\"error\":",HODErrorCode.INVALID_HOD_RESPONSE,",\"reason\":\"", error.localizedDescription, "\"}")
-                let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-                let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-                let hodError = HODErrorObject(json: errorObj)
-                addError(hodError)
-                return nil
+                logParserError(error)
             }
-        }
-        catch {
-            let err = String(format: "%@%d%@", arguments: ["{\"error\":", HODErrorCode.INVALID_HOD_RESPONSE, ",\"reason\":\"Invalid json response\"}"])
-            let errData = (err as NSString).dataUsingEncoding(NSUTF8StringEncoding)
-            let errorObj = (try! NSJSONSerialization.JSONObjectWithData(errData!, options: [])) as! NSDictionary
-            let hodError = HODErrorObject(json: errorObj)
-            addError(hodError)
-            return nil
         }
         return obj
     }
