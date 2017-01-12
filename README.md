@@ -24,6 +24,9 @@ Haven OnDemand is a set of over 60 APIs for handling all sorts of unstructured d
 For a full list of all the APIs and to try them out, check out https://www.havenondemand.com/developer/apis
 
 ## Integrate HODClient into iOS Swift project from  Cocoapods
+
+### PLEASE NOTE THAT THIS VERSION IS NOT AVAILABLE IN COCOAPOD YET! The instruction is just for future usage.
+
 1. Follow instructions from [this](https://guides.cocoapods.org/using/using-cocoapods.html) page to install and initialize CocoaPods
 2. Run `open -a PodFile` and add the following: 
 
