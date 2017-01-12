@@ -1,18 +1,28 @@
-# HODClient Library for iOS - SWIFT. V1.0
-
-----
-## Overview
-HODClient library for iOS - Swift is a utility class, which helps you easily access over 60 APIs from HPE Haven OnDemand platform.
+# iOS-swift client library for Haven OnDemand
+Official client library to help with calling Haven OnDemand APIs [http://havenondemand.com](http://havenondemand.com).
 
 The library contains 2 packages:
 
 * HODClient package for sending HTTP GET/POST requests to Haven OnDemand APIs.
-
 * HODResponseParser package for parsing JSON responses from Haven OnDemand APIs.
 
-HODClient library requires Swift 2.0 or newer.
+HODClient library requires Swift 3.0.
 
-----
+## What is Haven OnDemand?
+Haven OnDemand is a set of over 60 APIs for handling all sorts of unstructured data. Here are just some of our APIs' capabilities:
+* Speech to text
+* OCR
+* Text extraction
+* Indexing documents
+* Smart search
+* Language identification
+* Concept extraction
+* Sentiment analysis
+* Web crawlers
+* Machine learning
+
+For a full list of all the APIs and to try them out, check out https://www.havenondemand.com/developer/apis
+
 ## Integrate HODClient into iOS Swift project from  Cocoapods
 1. Follow instructions from [this](https://guides.cocoapods.org/using/using-cocoapods.html) page to install and initialize CocoaPods
 2. Run `open -a PodFile` and add the following: 
@@ -22,7 +32,7 @@ HODClient library requires Swift 2.0 or newer.
     use_frameworks!
 
     target 'YourApp' do
-    pod 'havenondemand', '1.0.4'
+    pod 'havenondemand', '1.0.5'
     end
 ```
 
@@ -43,350 +53,331 @@ HODClient library requires Swift 2.0 or newer.
 
 ----
 ## HODClient API References
-**Constructor**
+###Constructor
+Creates and initializes an HODClient object.
 
-    HODClient(apiKey:String, version:String = "v1")
-
-*Description:*
-
-* Creates and initializes an HODClient object.
+```
+HODClient(apiKey:String, version:String = "v1")
+```
 
 *Parameters:*
 
-* apiKey: your developer apikey.
-* version: Haven OnDemand API version. Currently it only supports version 1. Thus, the default value is "v1".
+* `apiKey` your developer apikey.
+* `version` Haven OnDemand API version. Currently it only supports version 1. Thus, the default value is "v1".
 
 *Example code:*
+```
+var hodClient:HODClient = HODClient(apiKey: "your-api-key")
+```
 
-    var hodClient:HODClient = HODClient(apiKey: "your-api-key")
+###Function GetRequest
+Sends a HTTP GET request to call a Haven OnDemand API.
 
-----
-**Function GetRequest**
-
-    GetRequest(inout params:Dictionary<String, AnyObject>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
-
-*Description:*
-
-* Sends a HTTP GET request to call a Haven OnDemand API.
+```
+GetRequest(inout params:Dictionary<String, AnyObject>, hodApp:String, async:Bool)
+```
 
 *Parameters:*
 
-* params: a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API.
-
->Note:
->In the case of a parameter type is an array<>, the value must be defined as an array [].
-
->E.g.:
-##
-    var params = Dictionary<String,AnyObject>()
-    var urls = [String]()
-    urls.append("http://www.cnn.com")
-    urls.append("http://www.bbc.com")
-    params["entity_type"] = ["people_eng","places_eng"]
-    params["url"] = urls
-
-* hodApp: a string to identify a Haven OnDemand API. E.g. "extractentities". Current supported apps are listed in the HODApps object.
-* mode [REQ_MODE.SYNC | REQ_MODE.ASYNC]: specifies API call as Asynchronous or Synchronous. The default mode is .ASYNC.
-
-*Return: void.*
+* `params` a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API.
+* `hodApp` a string to identify a Haven OnDemand API. E.g. "extractentities". Current supported apps are listed in the HODApps object.
+* `async` specifies API call as asynchronous or synchronous. The default value is true for asynchronous call.
 
 *Response:*
 
-* If the mode is "ASYNC", response will be returned via the requestCompletedWithJobID(response:String) callback function.
-* If the mode is "SYNC", response will be returned via the requestCompletedWithContent(response:String) callback function.
+* If the async is true, response will be returned via the requestCompletedWithJobID(response:String) callback function.
+* If the async is false, response will be returned via the requestCompletedWithContent(response:String) callback function.
 * If there is an error occurred, the error message will be sent via the onErrorOccurred(errorMessage:String) callback function.
 
 *Example code:*
-##
-    // Call the Entity Extraction API to find people and places from CNN website
 
-    var hodApp = hodClient.hodApps.ENTITY_EXTRACTION;
-    var entities = ["people_eng","places_eng"]
-    var params = Dictionary<String, AnyObject>()
-    params["url"] = "http://www.cnn.com"
-    params["entity_type"] = entities
-    hodClient.GetRequest(&params, hodApp:hodApp, requestMode: HODClient.REQ_MODE.SYNC);
+```
+// Call the Entity Extraction API to find people and places from CNN website
+   
+var hodApp = hodClient.hodApps.ENTITY_EXTRACTION;
+var entities = ["people_eng","places_eng"]
+var params = Dictionary<String, AnyObject>()
+params["url"] = "http://www.cnn.com"
+params["entity_type"] = entities
+hodClient.GetRequest(&params, hodApp:hodApp, async:false)
+```
 
-----
-**Function PostRequest**
+###Function PostRequest
+Sends a HTTP POST request to call a Haven OnDemand API.
 
-    PostRequest(inout params:Dictionary<String, Object>, hodApp:String, requestMode:REQ_MODE = .ASYNC)
-
-*Description:*
-
-* Sends a HTTP POST request to call a Haven OnDemand API.
+```
+PostRequest(inout params:Dictionary<String, Object>, hodApp:String, async:Bool)
+```
 
 *Parameters:*
 
-* params: a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API.
-
->Note:
->In the case of a parameter type is an array<>, the value must be defined as an array [].
-
->E.g.:
-##
-    var params = Dictionary<String,AnyObject>()
-    var urls = [String]()
-    urls.append("http://www.cnn.com")
-    urls.append("http://www.bbc.com")
-    params["entity_type"] = ["people_eng","places_eng"]
-    params["url"] = urls
-
-* hodApp: a string to identify a Haven OnDemand API. E.g. "ocrdocument". Current supported apps are listed in the HODApps object.
-* mode [REQ_MODE.SYNC | REQ_MODE.ASYNC]: specifies API call as Asynchronous or Synchronous. The default mode is .ASYNC.
-
-*Return: void.*
+* `params` a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand API, where the keys are the parameters of that API.
+* `hodApp` a string to identify a Haven OnDemand API. E.g. "ocrdocument". Current supported apps are listed in the HODApps object.
+* `async` specifies API call as asynchronous or synchronous. The default value is true for asynchronous call.
 
 *Response:*
 
-* If the mode is "ASYNC", response will be returned via the requestCompletedWithJobID(response:String) callback function.
-* If the mode is "SYNC", response will be returned via the requestCompletedWithContent(response:String) callback function.
+* If the async is true, response will be returned via the requestCompletedWithJobID(response:String) callback function.
+* If the async is false, response will be returned via the requestCompletedWithContent(response:String) callback function.
 * If there is an error occurred, the error message will be sent via the onErrorOccurred(errorMessage:String) callback function.
 
 *Example code:*
-##
-    // Call the OCR Document API to scan text from an image file
 
-    var hodApp = hodClient.hodApps.OCR_DOCUMENT
-    var params =  Dictionary<String,Object>()
-    params["file"] = "full/path/filename.jpg"
-    params["mode"] = "document_photo"
-    hodClient.PostRequest(&params, hodApp:hodApp, requestMode: HODClient.REQ_MODE.ASYNC);
+```
+// Call the OCR Document API to scan text from an image file
 
-----
-**Function GetJobResult**
+var hodApp = hodClient.hodApps.OCR_DOCUMENT
+var params =  Dictionary<String,Object>()
+params["file"] = "full/path/filename.jpg"
+params["mode"] = "document_photo"
+hodClient.PostRequest(&params, hodApp:hodApp, async:true)
+```
 
-    GetJobResult(jobID:String)
+###Function GetRequestCombination
 
-*Description:*
+Sends a HTTP GET request to call a combination API.
+```
+GetRequestCombination(inout params:Dictionary<String,AnyObject>, hodApp:String), async:Bool = true)
+```
 
-* Sends a request to Haven OnDemand to retrieve content identified by the jobID.
+*Parameters:*
+
+* `params` a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand combination API, where the keys are the parameters of that API.
+* `hodApp` a string to identify a Haven OnDemand combination API.
+* `async` specifies API call as asynchronous or synchronous. The default value is true for asynchronous call.
+
+*Example code:*
+
+```
+// Call a combination API named "ocrtoconcept", which recognizes text from an image and extract the concept of the text.
+params["url"] =  "http://www.some.domain/review.jpg" as AnyObject
+hodClient.GetRequestCombination(&params, hodApp:"ocrtoconcept", async: false);
+```
+
+###Function PostRequestCombination
+Sends a HTTP POST request to call a combination API.
+
+```
+PostRequestCombination(inout params:Dictionary<String,AnyObject>, hodApp:String, async:Bool = true)
+```
+
+*Parameters:*
+
+* `params` a Dictionary object containing key/value pair parameters to be sent to a Haven OnDemand combination API, where the keys are the parameters of that API.
+* `hodApp` a string to identify a Haven OnDemand combination API.
+* `async` specifies API call as asynchronous or synchronous. The default value is true for asynchronous call.
+
+*Response:*
+
+* If the async is true, response will be returned via the requestCompletedWithJobID(response:String) callback function.
+* If the async is false, response will be returned via the requestCompletedWithContent(response:String) callback function.
+* If there is an error occurred, the error message will be sent via the onErrorOccurred(errorMessage:String) callback function.
+
+**Example code:**
+
+```
+// Call a combination API named "imagetosentiment", which recognizes text from an image and analyze the sentiment of the text.
+
+var file = Dictionary<String,String>()
+file["imageFile"] = "fullpath/image.jpg"
+let files:NSMutableArray = []
+files.add(file)
+var params = Dictionary<String,AnyObject>()
+params["file"] = files as AnyObject
+hodClient.PostRequestCombination(&params, hodApp: "imagetosentiment")
+```
+
+###Function GetJobResult
+Sends a request to Haven OnDemand to retrieve content identified by the jobID.
+
+```
+GetJobResult(jobID:String)
+```
 
 *Parameter:*
 
-* jobID: the job ID returned from a Haven OnDemand API upon an asynchronous call.
+* `jobID` the job ID returned from a Haven OnDemand API upon an asynchronous call.
 
 *Response:*
 
 * Response will be returned via the requestCompletedWithContent(response:String)
 
-*Example code:*
-##
-    // Parse a JSON string contained a jobID and call the function to get the actual content from Haven OnDemand server
+###Function GetJobStatus
+Sends a request to Haven OnDemand to retrieve status of a job identified by a job ID. If the job is completed, the response will be the result of that job. Otherwise, the response will contain the current status of the job.
 
-    func requestCompletedWithJobID(response:String)
-    {
-        var resStr = response.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        var jsonError: NSError?
-        let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding);
-        let json = NSJSONSerialization.JSONObjectWithData(data!, options: nil, error: &jsonError) as! NSDictionary
-
-        if let unwrappedError = jsonError {
-            println("json error: \(unwrappedError)")
-        } else {
-            var jobId = json.valueForKey("jobID") as! String
-            hodClient.GetJobResult(jobId);
-        }  
-    }
-----
-**Function GetJobStatus**
-
-    GetJobStatus(jobID:String)
-
-*Description:*
-
-* Sends a request to Haven OnDemand to retrieve status of a job identified by a job ID. If the job is completed, the response will be the result of that job. Otherwise, the response will contain the current status of the job.
+```
+GetJobStatus(jobID:String)
+```
 
 *Parameter:*
 
-* jobID: the job ID returned from a Haven OnDemand API upon an asynchronous call.
+* `jobID` the job ID returned from a Haven OnDemand API upon an asynchronous call.
 
 *Response:*
 
 * Response will be returned via the requestCompletedWithContent(response:String)
 
-*Example code:*
-##
-    // Parse a JSON string contained a jobID and call the function to get the actual content from Haven OnDemand server
-
-    func requestCompletedWithJobID(response:String)
-    {
-        var resStr = response.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
-        var jsonError: NSError?
-        let data = (resStr as NSString).dataUsingEncoding(NSUTF8StringEncoding);
-        let json = NSJSONSerialization.JSONObjectWithData(data!, options: nil, error: &jsonError) as! NSDictionary
-
-        if let unwrappedError = jsonError {
-            println("json error: \(unwrappedError)")
-        } else {
-            var jobId = json.valueForKey("jobID") as! String
-            hodClient.GetJobResult(jobId);
-        }  
-    }
-----
-## API callback functions
+###Callback functions
 In your class, you will need to inherit the HODClientDelegate protocol and implement delegated functions to receive responses from the server
 
-    class MyAppClass : HODClientDelegate {
+```
+class MyAppClass : HODClientDelegate {
 
-        hodClient.delegate = self
+    hodClient.delegate = self
 
-        func requestCompletedWithJobID(response:String){ }
+    func requestCompletedWithJobID(response:String){ }
 
-        func requestCompletedWithContent(var response:String){ }
+    func requestCompletedWithContent(var response:String){ }
 
-        func onErrorOccurred(errorMessage:String){ }
-
-    }
+    func onErrorOccurred(errorMessage:String){ }
+}
+```
 #
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response will be returned to this callback function. The response is a JSON string containing the jobID.
 
-    func requestCompletedWithJobID(response:String)
-    {
+```
+func requestCompletedWithJobID(response:String)
+{
 
-    }
-#
+}
+```
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult() function, the response will be returned to this callback function. The response is a JSON string containing the actual result of the service.
 
-    func requestCompletedWithContent(var response:String)
-    {
+```
+func requestCompletedWithContent(var response:String)
+{
 
-    }
-#
+}
+```
 If there is an error occurred, the error message will be returned to this callback function.
 
-    func onErrorOccurred(errorMessage:String)
-    {
+```
+func onErrorOccurred(errorMessage:String)
+{
 
-    }
-----
+}
+```
+
 ## HODResponseParser API References
-**Constructor**
+###Constructor
+Creates and initializes an HODResponseParser object.
 
-    HODResponseParser()
-
-*Description:*
-
-* Creates and initializes an HODResponseParser object.
-
-*Parameters:*
-
-* None.
+```
+HODResponseParser()
+```
 
 *Example code:*
 
-    var hodParser:HODResponseParser = HODResponseParser()
+```
+var hodParser:HODResponseParser = HODResponseParser()
+```
+###Function ParseJobID
+Parses a jobID from a json string returned from an asynchronous API call.
 
-----
-**Function ParseJobID**
-
-    ParseJobID(jsonStr:String) -> String?
-
-*Description:*
-
-* Parses a jobID from a json string returned from an asynchronous API call.
-
+```
+ParseJobID(jsonStr:String) -> String?
+```
 *Parameters:*
 
-* jsonStr: a json string returned from an asynchronous API call.
+* `jsonStr` a json string returned from an asynchronous API call.
 
 *Returned value:*
 
 * The jobID or nil if not found.
 
 *Example code:*
-##
-    func requestCompletedWithJobID(response:String) {
-        let jobID : String? = hodParser.ParseJobID(response)
-        if jobID != nil {
-            hodClient.GetJobStatus(jobID!)
-        }
+
+```
+func requestCompletedWithJobID(response:String) {
+    let jobID : String? = hodParser.ParseJobID(response)
+    if jobID != nil {
+        hodClient.GetJobStatus(jobID!)
     }
+}
+```
 
-----
-**Function ParseSpeechRecognitionResponse**
+###Function ParseSpeechRecognitionResponse
+Parses a json response from Haven OnDemand Speech Recognition API and returns a SpeechRegconitionResponse object.
 
-    ParseSpeechRecognitionResponse(&jsonStr) -> SpeechRecognitionResponse?
-
-*Description:*
-
-* Parses a json response from Haven OnDemand Speech Recognition API and returns a SpeechRegconitionResponse object.
+```
+ParseSpeechRecognitionResponse(&jsonStr) -> SpeechRecognitionResponse?
+```
 
 >Note: See the full list of standard parser functions from the Standard response parser functions section at the end of this document.
 
 *Parameters:*
 
-* jsonStr: a json string returned from a synchronous API call or from the GetJobResult() or GetJobStatus() function.
+* `jsonStr` a json string returned from a synchronous API call or from the GetJobResult() or GetJobStatus() function.
 
 *Returned value:*
 
 * An object containing API's response values. If there is an error or if the job is not completed (callback from a GetJobStatus call), the returned object is nil and the error or job status can be accessed by calling the GetLastError() function.
 
 *Example code:*
-##
-    func requestCompletedWithContent(var response:String) {
-        if let resp = (hodParser.ParseSentimentAnalysisResponse(&response)) {
-            var result = "Positive:\n"
-            for item in resp.positive {
-                let i  = item as! SentimentAnalysisResponse.Entity
-                result += "Sentiment: " + i.sentiment + "\n"
-                result += "Score: " + String(format:"%.6f",i.score) + "\n"
-                result += "Topic: " + i.topic + "\n"
-                result += "Statement: " + i.original_text + "\n"
-                result += "Length: " + String(format:"%d",i.original_length) + "\n"
-                result += "------\n"
-            }
-            result += "Negative:\n"
-            for item in resp.negative {
-                let i  = item as! SentimentAnalysisResponse.Entity
-                result += "Sentiment: " + i.sentiment + "\n"
-                result += "Score: " + String(format:"%.6f",i.score) + "\n"
-                result += "Topic: " + i.topic + "\n"
-                result += "Statement: " + i.original_text + "\n"
-                result += "Length: " + String(format:"%d",i.original_length) + "\n"
-                result += "------\n"
-            }
-            result += "Aggregate:\n"
-            result += "Sentiment: " + resp.aggregate.sentiment + "\n"
-            result += "Score: " + String(format:"%.6f",resp.aggregate.score)
-            // print or consume result
-        } else {
-            let errors = hodParser.GetLastError()
-            var errorStr = ""
-            for error in errors {
-                let err = error as! HODErrorObject
-                errorMsg =  String(format: "Error code: %d\n", err.error)
-                errorMsg += String(format: "Error reason: %@\n", err.reason)
-                errorMsg += String(format: "Error detail: %@\n", err.detail)
-                errorMsg += String(format: "JobID: %@\n", err.jobID)
-                print(errorMsg)
-                if err.error == HODErrorCode.QUEUED { // queues
-                    // sleep for a few seconds then check the job status again
-                    hodClient.GetJobStatus(err.jobID)
-                    break
-                } else if err.error == HODErrorCode.IN_PROGRESS { // in progress
-                    // sleep for for a while then check the job status again
-                    hodClient.GetJobStatus(err.jobID)
-                    break
-                }
+
+```
+func requestCompletedWithContent(var response:String) {
+    if let resp = (hodParser.ParseSentimentAnalysisResponse(&response)) {
+        var result = "Positive:\n"
+        for item in resp.positive {
+            let i  = item as! SentimentAnalysisResponse.Entity
+            result += "Sentiment: " + i.sentiment + "\n"
+            result += "Score: " + String(format:"%.6f",i.score) + "\n"
+            result += "Topic: " + i.topic + "\n"
+            result += "Statement: " + i.original_text + "\n"
+            result += "Length: " + String(format:"%d",i.original_length) + "\n"
+            result += "------\n"
+        }
+        result += "Negative:\n"
+        for item in resp.negative {
+            let i  = item as! SentimentAnalysisResponse.Entity
+            result += "Sentiment: " + i.sentiment + "\n"
+            result += "Score: " + String(format:"%.6f",i.score) + "\n"
+            result += "Topic: " + i.topic + "\n"
+            result += "Statement: " + i.original_text + "\n"
+            result += "Length: " + String(format:"%d",i.original_length) + "\n"
+            result += "------\n"
+        }
+        result += "Aggregate:\n"
+        result += "Sentiment: " + resp.aggregate.sentiment + "\n"
+        result += "Score: " + String(format:"%.6f",resp.aggregate.score)
+        // print or consume result
+    } else {
+        let errors = hodParser.GetLastError()
+        var errorStr = ""
+        for error in errors {
+            let err = error as! HODErrorObject
+            errorMsg =  String(format: "Error code: %d\n", err.error)
+            errorMsg += String(format: "Error reason: %@\n", err.reason)
+            errorMsg += String(format: "Error detail: %@\n", err.detail)
+            errorMsg += String(format: "JobID: %@\n", err.jobID)
+            print(errorMsg)
+            if err.error == HODErrorCode.QUEUED { // queues
+                // sleep for a few seconds then check the job status again
+                hodClient.GetJobStatus(err.jobID)
+                break
+            } else if err.error == HODErrorCode.IN_PROGRESS { // in progress
+                // sleep for for a while then check the job status again
+                hodClient.GetJobStatus(err.jobID)
+                break
             }
         }
     }
+}
+```
 
-----
-**Function ParseCustomResponse**
+###Function ParseCustomResponse
+Parses a json string and returns the result as an NSDictionary object. You will need to define a custom class and parse the result into that class. See example below for more details.
 
-    ParseCustomResponse(inout jsonStr:String) -> NSDictionary?
-
-*Description:*
-
-* Parses a json string and returns the result as an NSDictionary object. You will need to define a custom class and parse the result into that class. See example below for more details.
+```
+ParseCustomResponse(_ jsonStr:inout String) -> NSDictionary?
+```
 
 *Parameters:*
 
-* jsonStr: a json string returned from a synchronous API call or from the GetJobResult() or GetJobStatus() function.
+* `jsonStr` a json string returned from a synchronous API call or from the GetJobResult() or GetJobStatus() function.
 
-*Returned value*
+*Returned value:*
 
 * A NSDictionary object containing API's result values. If there is an error or if the job is not completed (callback from a GetJobStatus call), the returned object is nil and the error or job status can be accessed by calling the GetLastError() function.
 
@@ -527,228 +518,231 @@ If there is an error occurred, the error message will be returned to this callba
         }
     }
 
-----
-**Function GetLastError**
 
-    GetLastError() -> NSMutableArray
+###Function GetLastError
+Get the latest error(s) if any happened during parsing the json string or HOD error returned from HOD server.
 
-*Description:*
+```
+GetLastError() -> NSMutableArray
+```
 
-* Get the latest error(s) if any happened during parsing the json string or HOD error returned from HOD server.
 > Note: The job "queued" or "in progress" status is also considered as an error situation. See the example below for how to detect and handle error status.
-
-*Parameters:*
-
-* None.
 
 *Returned value:*
 
 * A NSMutableArray contains HODErrorObject.
 
 *Example code:*
-##
-    let errors = hodParser.GetLastError()
-    var errorMsg = ""
-    for error in errors {
-        let err = error as! HODErrorObject
-        errorMsg =  String(format: "Error code: %d\n", err.error)
-        errorMsg += String(format: "Error reason: %@\n", err.reason)
-        errorMsg += String(format: "Error detail: %@\n", err.detail)
-        errorMsg += String(format: "JobID: %@\n", err.jobID)
-        print(errorMsg)
-        if err.error == HODErrorCode.QUEUED { // queues
-            // sleep for a few seconds then check the job status again
-            hodClient.GetJobStatus(err.jobID)
-            break
-        } else if err.error == HODErrorCode.IN_PROGRESS { // in progress
-            // sleep for for a while then check the job status again
-            hodClient.GetJobStatus(err.jobID)
-            break
-        }
-    }
 
-----
+```
+let errors = hodParser.GetLastError()
+var errorMsg = ""
+for error in errors {
+    let err = error as! HODErrorObject
+    errorMsg =  String(format: "Error code: %d\n", err.error)
+    errorMsg += String(format: "Error reason: %@\n", err.reason)
+    errorMsg += String(format: "Error detail: %@\n", err.detail)
+    errorMsg += String(format: "JobID: %@\n", err.jobID)
+    print(errorMsg)
+    if err.error == HODErrorCode.QUEUED { // queues
+        // sleep for a few seconds then check the job status again
+        hodClient.GetJobStatus(err.jobID)
+        break
+    } else if err.error == HODErrorCode.IN_PROGRESS { // in progress
+        // sleep for for a while then check the job status again
+        hodClient.GetJobStatus(err.jobID)
+        break
+    }
+}
+```
+
 ## Demo code 1:
 
 **Use the Entity Extraction API to extract people and places from cnn.com website with a synchronous GET request**
 
-    class MyAppClass : HODClientDelegate {
-        var hodClient:HODClient = HODClient(apiKey: "your-api-key")
-        hodClient.delegate = self
-        var hodParser:HODResponseParser = HODResponseParser()
-        var hodApp = ""
+```
+class MyAppClass : HODClientDelegate {
+    var hodClient:HODClient = HODClient(apiKey: "your-api-key")
+    hodClient.delegate = self
+    var hodParser:HODResponseParser = HODResponseParser()
+    var hodApp = ""
 
-        func useHODClient() {
-            var hodApp = hodClient.hodApps.ENTITY_EXTRACTION
-            var params =  Dictionary<String,Object>()
+    func useHODClient() {
+        var hodApp = hodClient.hodApps.ENTITY_EXTRACTION
+        var params =  Dictionary<String,Object>()
 
-            params["url"] = "http://www.cnn.com"
-            params["entity_type"] = ["people_eng","places_eng"]
-            params["unique_entities"] = "true"
+        params["url"] = "http://www.cnn.com"
+        params["entity_type"] = ["people_eng","places_eng"]
+        params["unique_entities"] = "true"
 
-            hodClient.GetRequest(&params, hodApp:hodApp, requestMode:HODClient.REQ_MODE.SYNC);
-        }
-
-        // implement delegated functions
-        func requestCompletedWithContent(var response:String){
-            if let dic = hodParser.ParseCustomResponse(&response) {
-                let obj = EntityExtractionResponse(json:dic)
-                var people = ""
-                var places = ""
-                for ent in obj.entities as NSArray as! [EntityExtractionResponse.Entity] {
-                    if ent.type == "people_eng" {
-                        people += ent.normalized_text + "\n"
-                        // parse any other interested information about this person ...
-                    }
-                    else if type == "places_eng" {
-                        places += ent.normalized_text + "\n"
-                        // parse any other interested information about this place ...
-                    }
-                }
-
-            } else {
-                checkErrorInResponse()
-            }
-        }
-        func checkErrorInResponse() {
-            let errors = hodParser.GetLastError()
-            var errorStr = ""
-            for error in errors {
-                let err = error as! HODErrorObject
-                errorStr = "Error code: " + String(format: "%d", err.error) + "\n"
-                errorStr += "Error reason: " + err.reason + "\n"
-                errorStr += "Error detail: " + err.detail + "\n"
-                errorStr += "Error jobID: " + err.jobID + "\n"
-            }
-            println(errorStr)
-        }
-
-        func onErrorOccurred(errorMessage:String){
-            // handle error if any
-        }
+        hodClient.GetRequest(&params, hodApp:hodApp, async:false);
     }
 
-----
+    // implement delegated functions
+    func requestCompletedWithContent(_ response:String){
+        if let obj = (hodParser.ParseEntityExtractionResponse(&response)) {
+            var people = ""
+            var places = ""
+            for ent in obj.entities as NSArray as! [EntityExtractionResponse.Entity] {
+                if ent.type == "people_eng" {
+                    people += ent.normalized_text + "\n"
+                    // parse any other interested information about this person ...
+                }
+                else if type == "places_eng" {
+                    places += ent.normalized_text + "\n"
+                    // parse any other interested information about this place ...
+                }
+            }            
+        }else{
+            checkErrorInResponse()
+        }
+    }
+    func checkErrorInResponse() {
+        let errors = hodParser.GetLastError()
+        var errorStr = ""
+        for error in errors {
+            let err = error as! HODErrorObject
+            errorStr = "Error code: " + String(format: "%d", err.error) + "\n"
+            errorStr += "Error reason: " + err.reason + "\n"
+            errorStr += "Error detail: " + err.detail + "\n"
+            errorStr += "Error jobID: " + err.jobID + "\n"
+        }
+        println(errorStr)
+    }
+
+    func onErrorOccurred(errorMessage:String){
+        // handle error if any
+    }
+}
+```
 
 ## Demo code 2:
 
 **Use the OCR Document API to scan text from an image with an asynchronous POST request**
 
-    class MyAppClass : HODClientDelegate {
-        var hodClient:HODClient = HODClient(apiKey: "your-api-key")
-        var hodParser:HODResponseParser = HODResponseParser()
-        hodClient.delegate = self
+```
+class MyAppClass : HODClientDelegate {
+    var hodClient:HODClient = HODClient(apiKey: "your-api-key")
+    var hodParser:HODResponseParser = HODResponseParser()
+    hodClient.delegate = self
 
-        func useHODClient() {
-            var hodApp = hodClient.hodApps.OCR_DOCUMENT
-            var params =  Dictionary<String,Object>()
-            params["file"] = "full/path/filename.jpg"
-            params["mode"] = "document_photo"
+    func useHODClient() {
+        var hodApp = hodClient.hodApps.OCR_DOCUMENT
+        var params =  Dictionary<String,AnyObject>()
+        params["file"] = "full/path/filename.jpg"
+        params["mode"] = "document_photo"
 
-            hodClient.PostRequest(&params, hodApp:hodApp, requestMode:HODClient.REQ_MODE.ASYNC);
+        hodClient.PostRequest(&params, hodApp:hodApp)
         }
 
-        // implement delegated functions
-        /**************************************************************************************
-        * An async request will result in a response with a jobID. We parse the response to get
-        * the jobID and send a request for the actual content identified by the jobID.
-        **************************************************************************************/
-        func requestCompletedWithJobID(response:String){
-            let jobID:String? = hodParser.ParseJobID(response)
-            if jobID != nil {
-                hodClient.GetJobStatus(jobID!)
-            }
-        }
-        func requestCompletedWithContent(var response:String){
-            if let resp = (hodParser.ParseOCRDocumentResponse(&response)) {
-                var result = "Scanned text:\n"
-                for item in resp.text_block {
-                    let i  = item as! OCRDocumentResponse.TextBlock
-                    result += "Text: " + i.text + "\n"
-                    result += "Top/Left: " + String(format: "%d/%d", i.top, i.left) + "\n"
-                    result += "------\n"
-                }
-                // print or consume result
-            } else {
-                let errors = hodParser.GetLastError()
-                var errorMsg = ""
-                for error in errors {
-                    let err = error as! HODErrorObject
-                    errorMsg =  String(format: "Error code: %d\n", err.error)
-                    errorMsg += String(format: "Error reason: %@\n", err.reason)
-                    errorMsg += String(format: "Error detail: %@\n", err.detail)
-                    errorMsg += String(format: "JobID: %@\n", err.jobID)
-                    print(errorMsg)
-                    if err.error == HODErrorCode.QUEUED { // queues
-                        // sleep for a few seconds then check the job status again
-                        hodClient.GetJobStatus(err.jobID)
-                        break
-                    } else if err.error == HODErrorCode.IN_PROGRESS { // in progress
-                        // sleep for for a while then check the job status again
-                        hodClient.GetJobStatus(err.jobID)
-                        break
-                    }
-                }
-            }
-        }
-        func onErrorOccurred(errorMessage:String){
-            // handle error if any
+    // implement delegated functions
+    /**************************************************************************************
+    * An async request will result in a response with a jobID. We parse the response to get
+    * the jobID and send a request for the actual content identified by the jobID.
+    **************************************************************************************/
+    func requestCompletedWithJobID(response:String){
+        let jobID:String? = hodParser.ParseJobID(response)
+        if jobID != nil {
+            hodClient.GetJobStatus(jobID!)
         }
     }
-
-----
+    func requestCompletedWithContent(var response:String){
+        if let resp = (hodParser.ParseOCRDocumentResponse(&response)) {
+            var result = "Scanned text:\n"
+            for item in resp.text_block {
+                let i  = item as! OCRDocumentResponse.TextBlock
+                result += "Text: " + i.text + "\n"
+                result += "Top/Left: " + String(format: "%d/%d", i.top, i.left) + "\n"
+                result += "------\n"
+            }
+            // print or consume result
+        }else{
+            let errors = hodParser.GetLastError()
+            var errorMsg = ""
+            for error in errors {
+                let err = error as! HODErrorObject
+                errorMsg =  String(format: "Error code: %d\n", err.error)
+                errorMsg += String(format: "Error reason: %@\n", err.reason)
+                errorMsg += String(format: "Error detail: %@\n", err.detail)
+                errorMsg += String(format: "JobID: %@\n", err.jobID)
+                print(errorMsg)
+                if err.error == HODErrorCode.QUEUED { // queues
+                    // sleep for a few seconds then check the job status again
+                    hodClient.GetJobStatus(err.jobID)
+                    break
+                }else if err.error == HODErrorCode.IN_PROGRESS { // in progress
+                    // sleep for for a while then check the job status again
+                    hodClient.GetJobStatus(err.jobID)
+                    break
+                }
+            }
+        }
+    }
+    func onErrorOccurred(errorMessage:String){
+        // handle error if any
+    }
+}
+```
 
 ## Standard response parser functions
 ```
-ParseSpeechRecognitionResponse(inout jsonStr:String) -> SpeechRecognitionResponse?
-ParseCancelConnectorScheduleResponse(inout jsonStr:String) -> CancelConnectorScheduleResponse?
-ParseConnectorHistoryResponse(inout jsonStr:String) -> ConnectorHistoryResponse?
-ParseConnectorStatusResponse(inout jsonStr:String) -> ConnectorStatusResponse?
-ParseCreateConnectorResponse(inout jsonStr:String) -> CreateConnectorResponse?
-ParseDeleteConnectorResponse(inout jsonStr:String) -> DeleteConnectorResponse?
-ParseRetrieveConnectorConfigurationFileResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationFileResponse?
-ParseRetrieveConnectorConfigurationAttrResponse(inout jsonStr:String) -> RetrieveConnectorConfigurationAttrResponse?
-ParseStartConnectorResponse(inout jsonStr:String) -> StartConnectorResponse?
-ParseStopConnectorResponse(inout jsonStr:String) -> StopConnectorResponse?
-ParseUpdateConnectorResponse(inout jsonStr:String) -> ConnectorResponse?
-ParseExpandContainerResponse(inout jsonStr:String) -> ExpandContainerResponse?
-ParseStoreObjectResponse(inout jsonStr:String) -> StoreObjectResponse?
-ParseViewDocumentResponse(inout jsonStr:String) -> ViewDocumentResponse?
-ParseGetCommonNeighborsResponse(inout jsonStr:String) -> GetCommonNeighborsResponse?
-ParseGetNeighborsResponse(inout jsonStr:String) -> GetNeighborsResponse?
-ParseGetNodesResponse(inout jsonStr:String) -> GetNodesResponse?
-ParseGetShortestPathResponse(inout jsonStr:String) -> GetShortestPathResponse?
-ParseGetSubgraphResponse(inout jsonStr:String) -> GetSubgraphResponse?
-ParseSuggestLinksResponse(inout jsonStr:String) -> SuggestLinksResponse?
-ParseSummarizeGraphResponse(inout jsonStr:String) -> SummarizeGraphResponse?
-ParseOCRDocumentResponse(inout jsonStr:String) -> OCRDocumentResponse?
-ParseRecognizeBarcodesResponse(inout jsonStr:String) -> RecognizeBarcodesResponse?
-ParseRecognizeImagesResponse(inout jsonStr:String) -> RecognizeImagesResponse?
-ParseDetectFacesResponse(inout jsonStr:String) -> DetectFacesResponse?
-ParsePredictResponse(inout jsonStr:String) -> PredictResponse?
-ParseRecommendResponse(inout jsonStr:String) -> RecommendResponse?
-ParseTrainPredictorResponse(inout jsonStr:String) -> TrainPredictorResponse?
-ParseCreateQueryProfileResponse(inout jsonStr:String) -> CreateQueryProfileResponse?
-ParseDeleteQueryProfileResponse(inout jsonStr:String) -> DeleteQueryProfileResponse?
-ParseRetrieveQueryProfileResponse(inout jsonStr:String) -> RetrieveQueryProfileResponse?
-ParseUpdateQueryProfileResponse(inout jsonStr:String) -> UpdateQueryProfileResponse?
-ParseFindRelatedConceptsResponse(inout jsonStr:String) -> FindRelatedConceptsResponse?
-ParseAutoCompleteResponse(inout jsonStr:String) -> AutoCompleteResponse?
-ParseExtractConceptsResponse(inout jsonStr:String) -> ExtractConceptsResponse?
-ParseExpandTermsResponse(inout jsonStr:String) -> ExpandTermsResponse?
-ParseHighlightTextResponse(inout jsonStr:String) -> HighlightTextResponse?
-ParseIdentifyLanguageResponse(inout jsonStr:String) -> IdentifyLanguageResponse?
-ParseTokenizeTextResponse(inout jsonStr:String) -> TokenizeTextResponse?
-ParseSentimentAnalysisResponse(inout jsonStr:String) -> SentimentAnalysisResponse?
-ParseAddToTextIndexResponse(inout jsonStr:String) -> AddToTextIndexResponse?
-ParseCreateTextIndexResponse(inout jsonStr:String) -> CreateTextIndexResponse?
-ParseDeleteTextIndexResponse(inout jsonStr:String) -> DeleteTextIndexResponse?
-ParseDeleteFromTextIndexResponse(inout jsonStr:String) -> DeleteFromTextIndexResponse?
-ParseIndexStatusResponse(inout jsonStr:String) -> IndexStatusResponse?
-ParseListResourcesResponse(inout jsonStr:String) -> ListResourcesResponse?
-ParseRestoreTextIndexResponse(inout jsonStr:String) -> RestoreTextIndexResponse?
-ParseAnomalyDetectionResponse(inout jsonStr:String) -> AnomalyDetectionResponse?
-ParseTrendAnalysisResponse(inout jsonStr:String) -> TrendAnalysisResponse?
+ParseSpeechRecognitionResponse(_ jsonStr:inout String) -> SpeechRecognitionResponse?
+ParseDetectSceneChangesResponse(_ jsonStr:inout String) -> DetectSceneChangesResponse?
+ParseLicensePlateRecognitionResponse(_ jsonStr:inout String) -> LicensePlateRecognitionResponse?
+ParseCancelConnectorScheduleResponse(_ jsonStr:inout String) -> CancelConnectorScheduleResponse?
+ParseConnectorHistoryResponse(_ jsonStr:inout String) -> ConnectorHistoryResponse?
+ParseConnectorStatusResponse(_ jsonStr:inout String) -> ConnectorStatusResponse?
+ParseCreateConnectorResponse(_ jsonStr:inout String) -> CreateConnectorResponse?
+ParseDeleteConnectorResponse(_ jsonStr:inout String) -> DeleteConnectorResponse?
+ParseRetrieveConnectorConfigurationFileResponse(_ jsonStr:inout String) -> RetrieveConnectorConfigurationFileResponse?
+ParseRetrieveConnectorConfigurationAttrResponse(_ jsonStr:inout String) -> RetrieveConnectorConfigurationAttrResponse?
+ParseStartConnectorResponse(_ jsonStr:inout String) -> StartConnectorResponse?
+ParseStopConnectorResponse(_ jsonStr:inout String) -> StopConnectorResponse?
+ParseUpdateConnectorResponse(_ jsonStr:inout String) -> ConnectorResponse?
+ParseExpandContainerResponse(_ jsonStr:inout String) -> ExpandContainerResponse?
+ParseStoreObjectResponse(_ jsonStr:inout String) -> StoreObjectResponse?
+ParseViewDocumentResponse(_ jsonStr:inout String) -> ViewDocumentResponse?
+ParseGetCommonNeighborsResponse(_ jsonStr:inout String) -> GetCommonNeighborsResponse?
+ParseGetNeighborsResponse(_ jsonStr:inout String) -> GetNeighborsResponse?
+ParseGetNodesResponse(_ jsonStr:inout String) -> GetNodesResponse?
+ParseGetShortestPathResponse(_ jsonStr:inout String) -> GetShortestPathResponse?
+ParseGetSubgraphResponse(_ jsonStr:inout String) -> GetSubgraphResponse?
+ParseSuggestLinksResponse(_ jsonStr:inout String) -> SuggestLinksResponse?
+ParseSummarizeGraphResponse(_ jsonStr:inout String) -> SummarizeGraphResponse?
+ParseOCRDocumentResponse(_ jsonStr:inout String) -> OCRDocumentResponse?
+ParseRecognizeBarcodesResponse(_ jsonStr:inout String) -> RecognizeBarcodesResponse?
+ParseRecognizeImagesResponse(_ jsonStr:inout String) -> RecognizeImagesResponse?
+ParseDetectFacesResponse(_ jsonStr:inout String) -> DetectFacesResponse?
+ParsePredictResponse(_ jsonStr:inout String) -> PredictResponse?
+ParsePredictV2Response(_ jsonStr:inout String) -> PredictV2Response?
+ParseRecommendResponse(_ jsonStr:inout String) -> RecommendResponse?
+ParseRecommendV2Response(_ jsonStr:inout String) -> RecommendV2Response?
+ParseTrainPredictionResponse(_ jsonStr:inout String) -> TrainPredictionResponse?
+ParseTrainPredictionV2Response(_ jsonStr:inout String) -> TrainPredictionV2Response?
+ParseCreateQueryProfileResponse(_ jsonStr:inout String) -> CreateQueryProfileResponse?
+ParseDeleteQueryProfileResponse(_ jsonStr:inout String) -> DeleteQueryProfileResponse?
+ParseRetrieveQueryProfileResponse(_ jsonStr:inout String) -> RetrieveQueryProfileResponse?
+ParseUpdateQueryProfileResponse(_ jsonStr:inout String) -> UpdateQueryProfileResponse?
+ParseFindRelatedConceptsResponse(_ jsonStr:inout String) -> FindRelatedConceptsResponse?
+ParseAutoCompleteResponse(_ jsonStr:inout String) -> AutoCompleteResponse?
+ParseExtractConceptsResponse(_ jsonStr:inout String) -> ExtractConceptsResponse?
+ParseEntityExtractionResponse(_ jsonStr:inout String) -> EntityExtractionResponse?
+ParseEntityExtractionV2Response(_ jsonStr:inout String) -> EntityExtractionV2Response?
+ParseExpandTermsResponse(_ jsonStr:inout String) -> ExpandTermsResponse?
+ParseHighlightTextResponse(_ jsonStr:inout String) -> HighlightTextResponse?
+ParseIdentifyLanguageResponse(_ jsonStr:inout String) -> IdentifyLanguageResponse?
+ParseTokenizeTextResponse(_ jsonStr:inout String) -> TokenizeTextResponse?
+ParseSentimentAnalysisResponse(_ jsonStr:inout String) -> SentimentAnalysisResponse?
+ParseSentimentAnalysisV2Response(_ jsonStr:inout String) -> SentimentAnalysisV2Response?
+ParseAddToTextIndexResponse(_ jsonStr:inout String) -> AddToTextIndexResponse?
+ParseCreateTextIndexResponse(_ jsonStr:inout String) -> CreateTextIndexResponse?
+ParseDeleteTextIndexResponse(_ jsonStr:inout String) -> DeleteTextIndexResponse?
+ParseDeleteFromTextIndexResponse(_ jsonStr:inout String) -> DeleteFromTextIndexResponse?
+ParseIndexStatusResponse(_ jsonStr:inout String) -> IndexStatusResponse?
+ParseListResourcesResponse(_ jsonStr:inout String) -> ListResourcesResponse?
+ParseRestoreTextIndexResponse(_ jsonStr:inout String) -> RestoreTextIndexResponse?
+ParseAnomalyDetectionResponse(_ jsonStr:inout String) -> AnomalyDetectionResponse?
+ParseTrendAnalysisResponse(_ jsonStr:inout String) -> TrendAnalysisResponse?
 ```
 
 ## License
