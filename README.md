@@ -1,4 +1,4 @@
-# iOS-swift client library for Haven OnDemand
+# iOS-Swift client library for Haven OnDemand
 Official client library to help with calling Haven OnDemand APIs [http://havenondemand.com](http://havenondemand.com).
 
 The library contains 2 packages:
@@ -6,7 +6,7 @@ The library contains 2 packages:
 * HODClient package for sending HTTP GET/POST requests to Haven OnDemand APIs.
 * HODResponseParser package for parsing JSON responses from Haven OnDemand APIs.
 
-HODClient library requires Swift 3.0.
+The library requires Swift 3.0.
 
 ## What is Haven OnDemand?
 Haven OnDemand is a set of over 60 APIs for handling all sorts of unstructured data. Here are just some of our APIs' capabilities:
