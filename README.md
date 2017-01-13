@@ -25,17 +25,15 @@ For a full list of all the APIs and to try them out, check out https://www.haven
 
 ## Integrate HODClient into iOS Swift project from  Cocoapods
 
-### PLEASE NOTE THAT THIS VERSION IS NOT AVAILABLE IN COCOAPOD YET! The instruction is just for future usage.
-
 1. Follow instructions from [this](https://guides.cocoapods.org/using/using-cocoapods.html) page to install and initialize CocoaPods
 2. Run `open -a PodFile` and add the following: 
 
     ```
-    platform :ios, '8.2'
+    platform :ios, '9.3'
     use_frameworks!
 
     target 'YourApp' do
-    pod 'havenondemand', '1.0.5'
+    pod 'havenondemand', '1.0.6'
     end
 ```
 
