@@ -33,7 +33,7 @@ For a full list of all the APIs and to try them out, check out https://www.haven
     use_frameworks!
 
     target 'YourApp' do
-    pod 'havenondemand', '1.0.6'
+    pod 'havenondemand', '1.0.7'
     end
 ```
 
@@ -226,18 +226,18 @@ class MyAppClass : HODClientDelegate {
 
     hodClient.delegate = self
 
-    func requestCompletedWithJobID(response:String){ }
+    func requestCompletedWithJobID(_ response:String){ }
 
-    func requestCompletedWithContent(var response:String){ }
+    func requestCompletedWithContent(_ response:String){ }
 
-    func onErrorOccurred(errorMessage:String){ }
+    func onErrorOccurred(_ errorMessage:String){ }
 }
 ```
 #
 When you call the GetRequest() or PostRequest() with the ASYNC mode, the response will be returned to this callback function. The response is a JSON string containing the jobID.
 
 ```
-func requestCompletedWithJobID(response:String)
+func requestCompletedWithJobID(_ response:String)
 {
 
 }
@@ -245,7 +245,7 @@ func requestCompletedWithJobID(response:String)
 When you call the GetRequest() or PostRequest() with the SYNC mode or call the GetJobResult() function, the response will be returned to this callback function. The response is a JSON string containing the actual result of the service.
 
 ```
-func requestCompletedWithContent(var response:String)
+func requestCompletedWithContent(_ response:String)
 {
 
 }
@@ -253,7 +253,7 @@ func requestCompletedWithContent(var response:String)
 If there is an error occurred, the error message will be returned to this callback function.
 
 ```
-func onErrorOccurred(errorMessage:String)
+func onErrorOccurred(_ errorMessage:String)
 {
 
 }
@@ -289,7 +289,7 @@ ParseJobID(jsonStr:String) -> String?
 *Example code:*
 
 ```
-func requestCompletedWithJobID(response:String) {
+func requestCompletedWithJobID(_ response:String) {
     let jobID : String? = hodParser.ParseJobID(response)
     if jobID != nil {
         hodClient.GetJobStatus(jobID!)
@@ -301,7 +301,7 @@ func requestCompletedWithJobID(response:String) {
 Parses a json response from Haven OnDemand Speech Recognition API and returns a SpeechRegconitionResponse object.
 
 ```
-ParseSpeechRecognitionResponse(&jsonStr) -> SpeechRecognitionResponse?
+ParseSpeechRecognitionResponse(jsonStr) -> SpeechRecognitionResponse?
 ```
 
 >Note: See the full list of standard parser functions from the Standard response parser functions section at the end of this document.
@@ -317,8 +317,8 @@ ParseSpeechRecognitionResponse(&jsonStr) -> SpeechRecognitionResponse?
 *Example code:*
 
 ```
-func requestCompletedWithContent(var response:String) {
-    if let resp = (hodParser.ParseSentimentAnalysisResponse(&response)) {
+func requestCompletedWithContent(_ response:String) {
+    if let resp = (hodParser.ParseSentimentAnalysisResponse(response)) {
         var result = "Positive:\n"
         for item in resp.positive {
             let i  = item as! SentimentAnalysisResponse.Entity
@@ -371,7 +371,7 @@ func requestCompletedWithContent(var response:String) {
 Parses a json string and returns the result as an NSDictionary object. You will need to define a custom class and parse the result into that class. See example below for more details.
 
 ```
-ParseCustomResponse(_ jsonStr:inout String) -> NSDictionary?
+ParseCustomResponse(jsonStr: String) -> NSDictionary?
 ```
 
 *Parameters:*
@@ -486,8 +486,8 @@ ParseCustomResponse(_ jsonStr:inout String) -> NSDictionary?
         }
     }
     // parse json string to a custom data object
-    func requestCompletedWithContent(var response:String) {
-        if let dic = hodParser.ParseCustomResponse(&jsonData) {
+    func requestCompletedWithContent(_ response:String) {
+        if let dic = hodParser.ParseCustomResponse(jsonData) {
             let obj = EntityExtractionResponse(json:dic)
             var result: String = ""
             for ent in obj.entities as NSArray as! [EntityExtractionResponse.Entity] {
@@ -581,7 +581,7 @@ class MyAppClass : HODClientDelegate {
 
     // implement delegated functions
     func requestCompletedWithContent(_ response:String){
-        if let obj = (hodParser.ParseEntityExtractionResponse(&response)) {
+        if let obj = (hodParser.ParseEntityExtractionResponse(response)) {
             var people = ""
             var places = ""
             for ent in obj.entities as NSArray as! [EntityExtractionResponse.Entity] {
@@ -641,14 +641,14 @@ class MyAppClass : HODClientDelegate {
     * An async request will result in a response with a jobID. We parse the response to get
     * the jobID and send a request for the actual content identified by the jobID.
     **************************************************************************************/
-    func requestCompletedWithJobID(response:String){
+    func requestCompletedWithJobID(_ response:String){
         let jobID:String? = hodParser.ParseJobID(response)
         if jobID != nil {
             hodClient.GetJobStatus(jobID!)
         }
     }
-    func requestCompletedWithContent(var response:String){
-        if let resp = (hodParser.ParseOCRDocumentResponse(&response)) {
+    func requestCompletedWithContent(_ response:String){
+        if let resp = (hodParser.ParseOCRDocumentResponse(response)) {
             var result = "Scanned text:\n"
             for item in resp.text_block {
                 let i  = item as! OCRDocumentResponse.TextBlock
@@ -679,7 +679,7 @@ class MyAppClass : HODClientDelegate {
             }
         }
     }
-    func onErrorOccurred(errorMessage:String){
+    func onErrorOccurred(_ errorMessage:String){
         // handle error if any
     }
 }
@@ -687,63 +687,63 @@ class MyAppClass : HODClientDelegate {
 
 ## Standard response parser functions
 ```
-ParseSpeechRecognitionResponse(_ jsonStr:inout String) -> SpeechRecognitionResponse?
-ParseDetectSceneChangesResponse(_ jsonStr:inout String) -> DetectSceneChangesResponse?
-ParseLicensePlateRecognitionResponse(_ jsonStr:inout String) -> LicensePlateRecognitionResponse?
-ParseCancelConnectorScheduleResponse(_ jsonStr:inout String) -> CancelConnectorScheduleResponse?
-ParseConnectorHistoryResponse(_ jsonStr:inout String) -> ConnectorHistoryResponse?
-ParseConnectorStatusResponse(_ jsonStr:inout String) -> ConnectorStatusResponse?
-ParseCreateConnectorResponse(_ jsonStr:inout String) -> CreateConnectorResponse?
-ParseDeleteConnectorResponse(_ jsonStr:inout String) -> DeleteConnectorResponse?
-ParseRetrieveConnectorConfigurationFileResponse(_ jsonStr:inout String) -> RetrieveConnectorConfigurationFileResponse?
-ParseRetrieveConnectorConfigurationAttrResponse(_ jsonStr:inout String) -> RetrieveConnectorConfigurationAttrResponse?
-ParseStartConnectorResponse(_ jsonStr:inout String) -> StartConnectorResponse?
-ParseStopConnectorResponse(_ jsonStr:inout String) -> StopConnectorResponse?
-ParseUpdateConnectorResponse(_ jsonStr:inout String) -> ConnectorResponse?
-ParseExpandContainerResponse(_ jsonStr:inout String) -> ExpandContainerResponse?
-ParseStoreObjectResponse(_ jsonStr:inout String) -> StoreObjectResponse?
-ParseViewDocumentResponse(_ jsonStr:inout String) -> ViewDocumentResponse?
-ParseGetCommonNeighborsResponse(_ jsonStr:inout String) -> GetCommonNeighborsResponse?
-ParseGetNeighborsResponse(_ jsonStr:inout String) -> GetNeighborsResponse?
-ParseGetNodesResponse(_ jsonStr:inout String) -> GetNodesResponse?
-ParseGetShortestPathResponse(_ jsonStr:inout String) -> GetShortestPathResponse?
-ParseGetSubgraphResponse(_ jsonStr:inout String) -> GetSubgraphResponse?
-ParseSuggestLinksResponse(_ jsonStr:inout String) -> SuggestLinksResponse?
-ParseSummarizeGraphResponse(_ jsonStr:inout String) -> SummarizeGraphResponse?
-ParseOCRDocumentResponse(_ jsonStr:inout String) -> OCRDocumentResponse?
-ParseRecognizeBarcodesResponse(_ jsonStr:inout String) -> RecognizeBarcodesResponse?
-ParseRecognizeImagesResponse(_ jsonStr:inout String) -> RecognizeImagesResponse?
-ParseDetectFacesResponse(_ jsonStr:inout String) -> DetectFacesResponse?
-ParsePredictResponse(_ jsonStr:inout String) -> PredictResponse?
-ParsePredictV2Response(_ jsonStr:inout String) -> PredictV2Response?
-ParseRecommendResponse(_ jsonStr:inout String) -> RecommendResponse?
-ParseRecommendV2Response(_ jsonStr:inout String) -> RecommendV2Response?
-ParseTrainPredictionResponse(_ jsonStr:inout String) -> TrainPredictionResponse?
-ParseTrainPredictionV2Response(_ jsonStr:inout String) -> TrainPredictionV2Response?
-ParseCreateQueryProfileResponse(_ jsonStr:inout String) -> CreateQueryProfileResponse?
-ParseDeleteQueryProfileResponse(_ jsonStr:inout String) -> DeleteQueryProfileResponse?
-ParseRetrieveQueryProfileResponse(_ jsonStr:inout String) -> RetrieveQueryProfileResponse?
-ParseUpdateQueryProfileResponse(_ jsonStr:inout String) -> UpdateQueryProfileResponse?
-ParseFindRelatedConceptsResponse(_ jsonStr:inout String) -> FindRelatedConceptsResponse?
-ParseAutoCompleteResponse(_ jsonStr:inout String) -> AutoCompleteResponse?
-ParseExtractConceptsResponse(_ jsonStr:inout String) -> ExtractConceptsResponse?
-ParseEntityExtractionResponse(_ jsonStr:inout String) -> EntityExtractionResponse?
-ParseEntityExtractionV2Response(_ jsonStr:inout String) -> EntityExtractionV2Response?
-ParseExpandTermsResponse(_ jsonStr:inout String) -> ExpandTermsResponse?
-ParseHighlightTextResponse(_ jsonStr:inout String) -> HighlightTextResponse?
-ParseIdentifyLanguageResponse(_ jsonStr:inout String) -> IdentifyLanguageResponse?
-ParseTokenizeTextResponse(_ jsonStr:inout String) -> TokenizeTextResponse?
-ParseSentimentAnalysisResponse(_ jsonStr:inout String) -> SentimentAnalysisResponse?
-ParseSentimentAnalysisV2Response(_ jsonStr:inout String) -> SentimentAnalysisV2Response?
-ParseAddToTextIndexResponse(_ jsonStr:inout String) -> AddToTextIndexResponse?
-ParseCreateTextIndexResponse(_ jsonStr:inout String) -> CreateTextIndexResponse?
-ParseDeleteTextIndexResponse(_ jsonStr:inout String) -> DeleteTextIndexResponse?
-ParseDeleteFromTextIndexResponse(_ jsonStr:inout String) -> DeleteFromTextIndexResponse?
-ParseIndexStatusResponse(_ jsonStr:inout String) -> IndexStatusResponse?
-ParseListResourcesResponse(_ jsonStr:inout String) -> ListResourcesResponse?
-ParseRestoreTextIndexResponse(_ jsonStr:inout String) -> RestoreTextIndexResponse?
-ParseAnomalyDetectionResponse(_ jsonStr:inout String) -> AnomalyDetectionResponse?
-ParseTrendAnalysisResponse(_ jsonStr:inout String) -> TrendAnalysisResponse?
+ParseSpeechRecognitionResponse(_ jsonStr:String) -> SpeechRecognitionResponse?
+ParseDetectSceneChangesResponse(_ jsonStr:String) -> DetectSceneChangesResponse?
+ParseLicensePlateRecognitionResponse(_ jsonStr:String) -> LicensePlateRecognitionResponse?
+ParseCancelConnectorScheduleResponse(_ jsonStr:String) -> CancelConnectorScheduleResponse?
+ParseConnectorHistoryResponse(_ jsonStr:String) -> ConnectorHistoryResponse?
+ParseConnectorStatusResponse(_ jsonStr:String) -> ConnectorStatusResponse?
+ParseCreateConnectorResponse(_ jsonStr:String) -> CreateConnectorResponse?
+ParseDeleteConnectorResponse(_ jsonStr:String) -> DeleteConnectorResponse?
+ParseRetrieveConnectorConfigurationFileResponse(_ jsonStr:String) -> RetrieveConnectorConfigurationFileResponse?
+ParseRetrieveConnectorConfigurationAttrResponse(_ jsonStr:String) -> RetrieveConnectorConfigurationAttrResponse?
+ParseStartConnectorResponse(_ jsonStr:String) -> StartConnectorResponse?
+ParseStopConnectorResponse(_ jsonStr:String) -> StopConnectorResponse?
+ParseUpdateConnectorResponse(_ jsonStr:String) -> ConnectorResponse?
+ParseExpandContainerResponse(_ jsonStr:String) -> ExpandContainerResponse?
+ParseStoreObjectResponse(_ jsonStr:String) -> StoreObjectResponse?
+ParseViewDocumentResponse(_ jsonStr:String) -> ViewDocumentResponse?
+ParseGetCommonNeighborsResponse(_ jsonStr:String) -> GetCommonNeighborsResponse?
+ParseGetNeighborsResponse(_ jsonStr:String) -> GetNeighborsResponse?
+ParseGetNodesResponse(_ jsonStr:String) -> GetNodesResponse?
+ParseGetShortestPathResponse(_ jsonStr:String) -> GetShortestPathResponse?
+ParseGetSubgraphResponse(_ jsonStr:String) -> GetSubgraphResponse?
+ParseSuggestLinksResponse(_ jsonStr:String) -> SuggestLinksResponse?
+ParseSummarizeGraphResponse(_ jsonStr:String) -> SummarizeGraphResponse?
+ParseOCRDocumentResponse(_ jsonStr:String) -> OCRDocumentResponse?
+ParseRecognizeBarcodesResponse(_ jsonStr:String) -> RecognizeBarcodesResponse?
+ParseRecognizeImagesResponse(_ jsonStr:String) -> RecognizeImagesResponse?
+ParseDetectFacesResponse(_ jsonStr:String) -> DetectFacesResponse?
+ParsePredictResponse(_ jsonStr:String) -> PredictResponse?
+ParsePredictV2Response(_ jsonStr:String) -> PredictV2Response?
+ParseRecommendResponse(_ jsonStr:String) -> RecommendResponse?
+ParseRecommendV2Response(_ jsonStr:String) -> RecommendV2Response?
+ParseTrainPredictionResponse(_ jsonStr:String) -> TrainPredictionResponse?
+ParseTrainPredictionV2Response(_ jsonStr:String) -> TrainPredictionV2Response?
+ParseCreateQueryProfileResponse(_ jsonStr:String) -> CreateQueryProfileResponse?
+ParseDeleteQueryProfileResponse(_ jsonStr:String) -> DeleteQueryProfileResponse?
+ParseRetrieveQueryProfileResponse(_ jsonStr:String) -> RetrieveQueryProfileResponse?
+ParseUpdateQueryProfileResponse(_ jsonStr:String) -> UpdateQueryProfileResponse?
+ParseFindRelatedConceptsResponse(_ jsonStr:String) -> FindRelatedConceptsResponse?
+ParseAutoCompleteResponse(_ jsonStr:String) -> AutoCompleteResponse?
+ParseExtractConceptsResponse(_ jsonStr:String) -> ExtractConceptsResponse?
+ParseEntityExtractionResponse(_ jsonStr:String) -> EntityExtractionResponse?
+ParseEntityExtractionV2Response(_ jsonStr:String) -> EntityExtractionV2Response?
+ParseExpandTermsResponse(_ jsonStr:String) -> ExpandTermsResponse?
+ParseHighlightTextResponse(_ jsonStr:String) -> HighlightTextResponse?
+ParseIdentifyLanguageResponse(_ jsonStr:String) -> IdentifyLanguageResponse?
+ParseTokenizeTextResponse(_ jsonStr:String) -> TokenizeTextResponse?
+ParseSentimentAnalysisResponse(_ jsonStr:String) -> SentimentAnalysisResponse?
+ParseSentimentAnalysisV2Response(_ jsonStr:String) -> SentimentAnalysisV2Response?
+ParseAddToTextIndexResponse(_ jsonStr:String) -> AddToTextIndexResponse?
+ParseCreateTextIndexResponse(_ jsonStr:String) -> CreateTextIndexResponse?
+ParseDeleteTextIndexResponse(_ jsonStr:String) -> DeleteTextIndexResponse?
+ParseDeleteFromTextIndexResponse(_ jsonStr:String) -> DeleteFromTextIndexResponse?
+ParseIndexStatusResponse(_ jsonStr:String) -> IndexStatusResponse?
+ParseListResourcesResponse(_ jsonStr:String) -> ListResourcesResponse?
+ParseRestoreTextIndexResponse(_ jsonStr:String) -> RestoreTextIndexResponse?
+ParseAnomalyDetectionResponse(_ jsonStr:String) -> AnomalyDetectionResponse?
+ParseTrendAnalysisResponse(_ jsonStr:String) -> TrendAnalysisResponse?
 ```
 
 ## License
